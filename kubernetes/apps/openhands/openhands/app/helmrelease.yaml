@@ -103,7 +103,7 @@ spec:
               apiVersion: batch/v1
               kind: Job
               metadata:
-                name: migrate-db
+                name: openhands-runtime-api-migrate-db
               spec:
                 template:
                   spec:
