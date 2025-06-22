@@ -125,3 +125,10 @@ spec:
                           - -c
                           - |
                             until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 5; done
+          - target:
+              group: batch
+              version: v1
+              kind: Job
+              name: openhands-runtime-api-migrate-db
+            patch: |-
+              $patch: delete
