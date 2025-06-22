@@ -8,6 +8,11 @@ import re
 import json
 
 
+# Base64 encode a string
+def b64encode(value: str) -> str:
+    return base64.b64encode(value.encode("utf-8")).decode("utf-8")
+
+
 # Return the filename of a path without the j2 extension
 def basename(value: str) -> str:
     return Path(value).stem
@@ -153,7 +158,8 @@ class Plugin(makejinja.plugin.Plugin):
     def filters(self) -> makejinja.plugin.Filters:
         return [
             basename,
-            nthhost
+            nthhost,
+            b64encode
         ]
 
 

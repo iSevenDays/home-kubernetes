@@ -1,12 +1,14 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/refs/heads/main/ocirepository-source-v1beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/ocirepository-source-v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: bitnami
   namespace: flux-system
 spec:
-  interval: 24h
+  interval: 1h
   url: oci://registry-1.docker.io/bitnamicharts
   ref:
     semver: "^16.4.3"
+  secretRef:
+    name: bitnami-credentials
