@@ -5,3 +5,4 @@ resources:
   - ./secret.sops.yaml
   - ./secret-extras.sops.yaml
   - ./helmrelease.yaml
+  - ./httproute.yaml
