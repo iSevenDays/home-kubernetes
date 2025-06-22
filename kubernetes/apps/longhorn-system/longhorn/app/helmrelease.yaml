@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: longhorn
-      version: 1.6.2 # Note: Using a specific version for stability
+      version: 1.9.0 # Note: Using a specific version for stability
       sourceRef:
         kind: HelmRepository
         name: longhorn
