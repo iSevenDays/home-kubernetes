@@ -43,9 +43,9 @@ spec:
     migrationJob:
       enabled: true
       db:
-        host: openhands-postgresql   # same Service name
-        name: openhands              # same database
-        user: postgres
+        host: "openhands-postgresql"
+        name: "openhands"
+        user: "postgres"
         passwordSecret: postgres-password
     redis:
       enabled: true
