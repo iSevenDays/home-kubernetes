@@ -26,6 +26,10 @@ import (
 	cilium_bgp_router_asn?: string & !=""
 	cilium_bgp_node_asn?: string & !=""
 	cilium_loadbalancer_mode?: *"dsr" | "snat"
+	openhands_global_secret?: string & !=""
+	litellm_team_id?: string & !=""
+	openhands_pg_password?: string & !=""
+	openhands_redis_password?: string & !=""
 }
 
 #Config
