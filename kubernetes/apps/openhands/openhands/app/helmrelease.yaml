@@ -45,6 +45,8 @@ spec:
       teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
       enabled: true
+      environmentSecrets:
+        - litellm-env-secrets
       ingress:
         enabled: false  # port-forward initially
       masterkeySecretName: lite-llm-api-key
@@ -63,4 +65,4 @@ spec:
     podAnnotations:
       secret.reloader.stakater.com/reload: |
         sandbox-api-key,postgres-password,redis,jwt-secret,
-        lite-llm-api-key,keycloak-realm,keycloak-admin
+        lite-llm-api-key,keycloak-realm,keycloak-admin,litellm-env-secrets
