@@ -32,12 +32,21 @@ spec:
     postgresql:
       enabled: true
       auth:
+        database: openhands
+        username: postgres
         existingSecret: postgres-password
       primary:
         persistence:
           enabled: true
           storageClass: "longhorn"
           size: 10Gi
+    migrationJob:
+      enabled: true
+      db:
+        host: openhands-postgresql   # same Service name
+        name: openhands              # same database
+        user: postgres
+        passwordSecret: postgres-password
     redis:
       enabled: true
     sandbox:
