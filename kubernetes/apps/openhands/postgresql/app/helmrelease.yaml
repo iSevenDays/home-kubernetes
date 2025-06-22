@@ -10,10 +10,9 @@ spec:
     spec:
       chart: postgresql
       sourceRef:
-        kind: HelmRepository
+        kind: OCIRepository
         name: bitnami-oci
         namespace: flux-system
-      version: 15.5.1
   install:
     remediation:
       retries: 3
