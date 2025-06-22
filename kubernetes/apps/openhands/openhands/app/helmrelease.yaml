@@ -45,3 +45,7 @@ spec:
       teamId: "${LITELLM_TEAM_ID}"
     runtime-api:
       enabled: true
+    podAnnotations:
+      secret.reloader.stakater.com/reload: |
+        sandbox-api-key,postgres-password,redis,jwt-secret,
+        lite-llm-api-key,keycloak-realm,keycloak-admin
