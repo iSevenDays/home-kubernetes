@@ -117,7 +117,7 @@ spec:
                   spec:
                     initContainers:
                       - name: wait-postgres
-                        image: postgres:15
+                        image: postgres:17
                         command:
                           - sh
                           - -c
