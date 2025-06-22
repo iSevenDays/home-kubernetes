@@ -34,7 +34,8 @@ spec:
         existingSecret: postgres-password
       primary:
         persistence:
-          enabled: false # TODO: Enable this when we have a persistent volume
+          enabled: true
+          size: 6Gi
     redis:
       enabled: true
     sandbox:
