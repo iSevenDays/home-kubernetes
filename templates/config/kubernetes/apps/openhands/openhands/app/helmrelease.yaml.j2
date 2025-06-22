@@ -28,9 +28,20 @@ spec:
       enabled: false
     tls:
       enabled: true
+    postgresql:
+      enabled: true
+      auth:
+        existingSecret: postgres-password
+      primary:
+        persistence:
+          enabled: false # TODO: Enable this when we have a persistent volume
+    redis:
+      enabled: true
     sandbox:
       apiHostname: "https://runtime-api.${SECRET_DOMAIN}"
     litellm:
       url: "https://llm-proxy.${SECRET_DOMAIN}"
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
+    runtime-api:
+      enabled: true
