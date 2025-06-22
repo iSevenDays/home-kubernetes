@@ -9,6 +9,6 @@ spec:
   interval: 1h
   url: oci://registry-1.docker.io/bitnamicharts
   ref:
-    semver: "^16.4.3"
+    tag: "16.4.3"
   secretRef:
     name: bitnami-credentials
