@@ -8,11 +8,11 @@ spec:
   chart:
     spec:
       chart: longhorn
-      version: 1.6.2 # Note: Using a specific version for stability
+      version: 1.6.3 # Note: Using a specific version for stability
       sourceRef:
         kind: HelmRepository
         name: longhorn
-        namespace: longhorn-system
+        namespace: flux-system
   install:
     remediation:
       retries: 3
