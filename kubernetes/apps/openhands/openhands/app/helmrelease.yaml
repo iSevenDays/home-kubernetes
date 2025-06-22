@@ -79,3 +79,14 @@ spec:
       secret.reloader.stakater.com/reload: |
         sandbox-api-key,postgres-password,redis,jwt-secret,
         lite-llm-api-key,keycloak-realm,keycloak-admin,litellm-env-secrets
+    controller:
+      main:
+        containers:
+          main:
+            startupProbe:
+              httpGet:
+                path: /health
+                port: 5000
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              failureThreshold: 15
