@@ -7,10 +7,16 @@ metadata:
 spec:
   path: ./kubernetes/apps/longhorn-system/longhorn/app
   prune: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   sourceRef:
     kind: GitRepository
-    name: longhorn-system
+    name: flux-system
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
   timeout: 5m
+  targetNamespace: longhorn-system
