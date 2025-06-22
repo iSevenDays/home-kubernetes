@@ -76,6 +76,7 @@ spec:
         failureThreshold: 12
       env:
         DB_HOST: "openhands-postgresql"
+        DB_NAME: "openhands"
     podAnnotations:
       secret.reloader.stakater.com/reload: |
         sandbox-api-key,postgres-password,redis,jwt-secret,
