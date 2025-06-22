@@ -10,5 +10,5 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 0.45.0  # latest stable at 2025-06-20
+    semver: ">=0.0.0-0"
   url: oci://ghcr.io/all-hands-ai/helm-charts/openhands
