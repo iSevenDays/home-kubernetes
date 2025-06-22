@@ -95,3 +95,27 @@ spec:
               initialDelaySeconds: 30
               periodSeconds: 10
               failureThreshold: 15
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: batch
+              version: v1
+              kind: Job
+              name: migrate-db
+            patch: |-
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                name: migrate-db
+              spec:
+                template:
+                  spec:
+                    initContainers:
+                      - name: wait-postgres
+                        image: postgres:15
+                        command:
+                          - sh
+                          - -c
+                          - |
+                            until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 5; done
