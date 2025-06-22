@@ -45,6 +45,10 @@ spec:
       teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
       enabled: true
+      db:
+        endpoint: "openhands-postgresql"
+        deployStandalone: false
+        useExisting: true
       environmentSecrets:
         - litellm-env-secrets
       ingress:
@@ -62,6 +66,8 @@ spec:
               max_tokens: ${litellm_max_output_tokens}
     runtime-api:
       enabled: true
+      env:
+        DB_HOST: "openhands-postgresql"
     podAnnotations:
       secret.reloader.stakater.com/reload: |
         sandbox-api-key,postgres-password,redis,jwt-secret,
