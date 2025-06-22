@@ -66,6 +66,11 @@ spec:
               max_tokens: 20000
     runtime-api:
       enabled: true
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        failureThreshold: 12
       env:
         DB_HOST: "openhands-postgresql"
     podAnnotations:
