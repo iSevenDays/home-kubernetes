@@ -16,9 +16,14 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  releaseName: openhands
   dependsOn:
     - name: cloudflare-tunnel
       namespace: network
+  valuesFrom:
+    - kind: Secret
+      name: openhands-secrets
+      valuesKey: OPENHANDS_HELM_VALUES
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
@@ -36,7 +41,7 @@ spec:
         persistence:
           enabled: true
           storageClass: "longhorn"
-          size: 6Gi
+          size: 10Gi
     redis:
       enabled: true
     sandbox:
