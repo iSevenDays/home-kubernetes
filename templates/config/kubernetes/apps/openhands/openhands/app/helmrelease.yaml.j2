@@ -43,6 +43,21 @@ spec:
       url: "https://llm-proxy.${SECRET_DOMAIN}"
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
+    litellm-helm:
+      enabled: true
+      ingress:
+        enabled: false  # port-forward initially
+      masterkeySecretName: lite-llm-api-key
+      masterkeySecretKey: lite-llm-api-key
+      proxy_config:
+        model_list:
+          - model_name: "${litellm_model}"
+            litellm_params:
+              model: "${litellm_model}"
+              api_base: "${litellm_base_url}"
+              api_key: "${litellm_api_key}"
+              timeout: ${litellm_timeout}
+              max_tokens: ${litellm_max_output_tokens}
     runtime-api:
       enabled: true
     podAnnotations:
