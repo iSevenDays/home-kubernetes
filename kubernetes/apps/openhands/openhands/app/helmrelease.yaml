@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openhands
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: openhands
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  dependsOn:
+    - name: cloudflare-tunnel
+      namespace: network
+  values:
+    # The chart provides an Ingress resource but this cluster exposes
+    # services via Gateway API HTTPRoutes.  We therefore disable the
+    # built-in Ingress and create a separate HTTPRoute manifest (see
+    # ../gateway/route.yaml.j2) that forwards external traffic.
+    ingress:
+      enabled: false
+    tls:
+      enabled: true
+    sandbox:
+      apiHostname: "https://runtime-api.${SECRET_DOMAIN}"
+    litellm:
+      url: "https://llm-proxy.${SECRET_DOMAIN}"
+      # Injected from SOPS-encrypted secret rendered from templates
+      teamId: "${LITELLM_TEAM_ID}"
