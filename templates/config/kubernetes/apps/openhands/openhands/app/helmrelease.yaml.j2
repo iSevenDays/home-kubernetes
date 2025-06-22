@@ -30,16 +30,14 @@ spec:
     tls:
       enabled: true
     postgresql:
-      enabled: true
-      auth:
-        database: openhands
-        username: postgres
-        existingSecret: postgres-password
-      primary:
-        persistence:
-          enabled: true
-          storageClass: "longhorn"
-          size: 10Gi
+      enabled: false
+
+    externalDatabase:
+      host: "openhands-postgresql"
+      port: 5432
+      user: "postgres"
+      database: "openhands"
+      existingSecret: postgres-password
     migrationJob:
       enabled: true
       db:
@@ -125,10 +123,3 @@ spec:
                           - -c
                           - |
                             until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 5; done
-          - target:
-              group: batch
-              version: v1
-              kind: Job
-              name: openhands-runtime-api-migrate-db
-            patch: |-
-              $patch: delete
