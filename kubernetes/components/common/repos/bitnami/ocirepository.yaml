@@ -3,7 +3,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: bitnami-oci
+  name: bitnami
   namespace: flux-system
 spec:
   interval: 1h
