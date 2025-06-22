@@ -6,4 +6,4 @@ resources:
   - ./app-template
   - ./openhands
   - ./longhorn
-  - ./bitnami-oci
+  - ./bitnami
