@@ -62,8 +62,8 @@ spec:
               model: "os.environ/LLM_MODEL"
               api_base: "os.environ/LLM_BASE_URL"
               api_key: "os.environ/LLM_API_KEY"
-              timeout: "os.environ/LLM_TIMEOUT"
-              max_tokens: "os.environ/LLM_MAX_OUTPUT_TOKENS"
+              timeout: 3600
+              max_tokens: 20000
     runtime-api:
       enabled: true
       env:
