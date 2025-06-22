@@ -28,8 +28,14 @@ import (
 	cilium_loadbalancer_mode?: *"dsr" | "snat"
 	openhands_global_secret?: string & !=""
 	litellm_team_id?: string & !=""
+	litellm_model?: string & !=""
+	litellm_base_url?: string & !=""
+	litellm_api_key?: string & !=""
+	litellm_timeout?: int & !=0
+	litellm_max_output_tokens?: int & !=0
 	openhands_pg_password?: string & !=""
 	openhands_redis_password?: string & !=""
+
 }
 
 #Config
