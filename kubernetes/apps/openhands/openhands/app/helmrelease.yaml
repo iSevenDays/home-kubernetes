@@ -20,6 +20,22 @@ spec:
   releaseName: openhands
   dependsOn:
     - name: openhands-postgresql
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Job
+              name: openhands-runtime-api-migrate-db
+            patch: |-
+              - op: add
+                path: /spec/template/spec/initContainers
+                value:
+                  - name: wait-for-postgres
+                    image: postgres:15
+                    command:
+                      - sh
+                      - -c
+                      - "until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 2; done"
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
@@ -67,30 +83,6 @@ spec:
               api_key: "os.environ/LLM_API_KEY"
               timeout: 3600
               max_tokens: 20000
-    runtime-api:
-      enabled: true
-      migrationJob:
-        enabled: true
-        initContainers:
-          - name: wait-for-postgres
-            image: postgres:15
-            command:
-              - sh
-              - -c
-              - "until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 2; done"
-      db:
-        host: "openhands-postgresql"
-        name: "openhands"
-        user: "postgres"
-        passwordSecret: "postgres-password"
-      startupProbe:
-        enabled: true
-        initialDelaySeconds: 60
-        periodSeconds: 10
-        failureThreshold: 12
-      env:
-        DB_HOST: "openhands-postgresql"
-        DB_NAME: "openhands"
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
