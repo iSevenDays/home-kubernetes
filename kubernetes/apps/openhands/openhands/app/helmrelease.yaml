@@ -83,5 +83,10 @@ spec:
         DB_HOST: "openhands-postgresql"
         DB_NAME: "openhands"
         DB_USER: "postgres"
+        DB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: postgres-password
+              key: password
         STORAGE_CLASS: "longhorn"
 
