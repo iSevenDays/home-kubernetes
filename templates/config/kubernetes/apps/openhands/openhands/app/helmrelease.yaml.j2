@@ -47,11 +47,15 @@ spec:
       enabled: true
     postgresql:
       enabled: false
+    keycloak:
+      externalDatabase:
+        host: "openhands-postgresql"
+        port: 5432
+        existingSecret: postgres-password
 
     externalDatabase:
       host: "openhands-postgresql"
       port: 5432
-      user: "postgres"
       database: "openhands"
       existingSecret: postgres-password
     redis:
@@ -68,6 +72,9 @@ spec:
         endpoint: "openhands-postgresql"
         deployStandalone: false
         useExisting: true
+        database: "openhands"
+        secret:
+          name: postgres-password
       environmentSecrets:
         - litellm-env-secrets
       ingress:
@@ -86,16 +93,17 @@ spec:
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
-    controller:
-      main:
-        containers:
-          main:
-            startupProbe:
-              httpGet:
-                path: /health
-                port: 5000
-              initialDelaySeconds: 30
-              periodSeconds: 10
-              failureThreshold: 15
-    env:
-      STORAGE_CLASS: "longhorn"
+    runtime-api:
+      postgresql:
+        auth:
+          existingSecret: postgres-password
+      env:
+        - name: DB_HOST
+          value: "openhands-postgresql"
+        - name: DB_NAME
+          value: "openhands"
+        - name: DB_USER
+          value: "postgres"
+        - name: STORAGE_CLASS
+          value: "longhorn"
+
