@@ -91,6 +91,8 @@ spec:
     fullnameOverride: openhands-app
     runtime-api:
       enabled: true
+      migrationJob:
+        enabled: true
       ingress:
         enabled: false
       postgresql:
