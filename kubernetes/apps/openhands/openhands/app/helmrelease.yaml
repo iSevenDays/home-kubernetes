@@ -39,19 +39,6 @@ spec:
       user: "postgres"
       database: "openhands"
       existingSecret: postgres-password
-    migrationJob:
-      enabled: true
-      waitForDependencies:
-        - name: openhands-postgresql
-          namespace: openhands
-          type: pod
-          labels:
-            app.kubernetes.io/name: postgresql
-      db:
-        host: "openhands-postgresql"
-        name: "openhands"
-        user: "postgres"
-        passwordSecret: postgres-password
     redis:
       enabled: true
     sandbox:
@@ -81,8 +68,22 @@ spec:
               api_key: "os.environ/LLM_API_KEY"
               timeout: 3600
               max_tokens: 20000
+
     runtime-api:
       enabled: true
+      migrationJob:
+        enabled: true
+        waitForDependencies:
+          - name: openhands-postgresql
+            namespace: openhands
+            type: pod
+            labels:
+              app.kubernetes.io/name: postgresql
+        db:
+          host: "openhands-postgresql"
+          name: "openhands"
+          user: "postgres"
+          passwordSecret: postgres-password
       startupProbe:
         enabled: true
         initialDelaySeconds: 60
@@ -91,6 +92,7 @@ spec:
       env:
         DB_HOST: "openhands-postgresql"
         DB_NAME: "openhands"
+
     podAnnotations:
       secret.reloader.stakater.com/reload: |
         sandbox-api-key,postgres-password,redis,jwt-secret,
