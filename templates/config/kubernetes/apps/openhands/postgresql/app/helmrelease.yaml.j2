@@ -25,10 +25,10 @@ spec:
       username: postgres
       database: openhands
       existingSecret: postgres-password
+    image:
+      tag: 16.5.0-debian-11-r0
     primary:
       persistence:
         enabled: true
         storageClass: longhorn
         size: 10Gi
-      image:
-        tag: 16.5.0-debian-11-r0
