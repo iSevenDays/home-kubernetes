@@ -20,6 +20,8 @@ spec:
   releaseName: openhands
   dependsOn:
     - name: openhands-postgresql
+    - name: openhands-keycloak
+    - name: openhands-runtime-api
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
@@ -33,21 +35,8 @@ spec:
       enabled: false
     keycloak:
       enabled: false
-      postgresql:
-        enabled: false
-      ingress:
-        enabled: false
-      externalDatabase:
-        host: "openhands-postgresql"
-        port: 5432
-        database: openhands
-        existingSecret: postgres-password
-      resources:
-        requests:
-          memory: "1Gi"
-        limits:
-          memory: "2Gi"
-          cpu: "1"
+    runtime-api:
+      enabled: false
     externalDatabase:
       host: "openhands-postgresql"
       port: 5432
@@ -89,26 +78,6 @@ spec:
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
-    runtime-api:
-      enabled: false
-      migrationJob:
-        enabled: true
-      ingress:
-        enabled: false
-      postgresql:
-        auth:
-          existingSecret: postgres-password
-        postMigrate: true
-      startupProbe:
-        enabled: true
-        initialDelaySeconds: 60
-        periodSeconds: 15
-        failureThreshold: 20
-      env:
-        DB_HOST: "openhands-postgresql"
-        DB_NAME: "openhands"
-        DB_USER: "postgres"
-        STORAGE_CLASS: "longhorn"
     env:
         DB_HOST: "openhands-postgresql"
         DB_NAME: "openhands"
