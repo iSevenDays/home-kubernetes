@@ -26,3 +26,6 @@ spec:
     namespace: flux-system
   targetNamespace: openhands
   wait: false
+  dependsOn:
+    - name: openhands-postgresql
+    - name: openhands-secrets

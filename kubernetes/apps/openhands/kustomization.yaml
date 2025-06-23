@@ -6,6 +6,7 @@ namespace: openhands
 components:
   - ../../components/common
 resources:
+  - ./secrets/ks.yaml
   - ./openhands/ks.yaml
   - ./postgresql/ks.yaml
   - ./runtime-api/ks.yaml
