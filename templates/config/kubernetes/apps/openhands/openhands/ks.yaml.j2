@@ -13,7 +13,7 @@ spec:
     secretRef:
       name: sops-age
   interval: 1h
-  path: ./kubernetes/apps/openhands/openhands/app
+  path: ./kubernetes/apps/openhands
   postBuild:
     substituteFrom:
       - kind: Secret
