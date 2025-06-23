@@ -48,11 +48,6 @@ spec:
       url: "https://auth.${SECRET_DOMAIN}"
     runtime-api:
       enabled: false
-    externalDatabase:
-      host: "openhands-postgresql"
-      port: 5432
-      database: "openhands"
-      existingSecret: "postgres-password"
     redis:
       enabled: true
     sandbox:
