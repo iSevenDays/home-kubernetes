@@ -20,22 +20,6 @@ spec:
   releaseName: openhands
   dependsOn:
     - name: openhands-postgresql
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: Job
-              name: openhands-runtime-api-migrate-db
-            patch: |-
-              - op: add
-                path: /spec/template/spec/initContainers
-                value:
-                  - name: wait-for-postgres
-                    image: postgres:15
-                    command:
-                      - sh
-                      - -c
-                      - "until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 2; done"
   values:
     env:
       DB_HOST: "openhands-postgresql"
@@ -103,4 +87,5 @@ spec:
       postgresql:
         auth:
           existingSecret: postgres-password
+        postMigrate: true
 
