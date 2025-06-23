@@ -40,6 +40,16 @@ spec:
       enabled: false
     openhands:
       enabled: true
+      env:
+        DB_HOST: "openhands-postgresql"
+        DB_NAME: "openhands"
+        DB_USER: "postgres"
+        DB_PASS:
+          valueFrom:
+            secretKeyRef:
+              name: postgres-password
+              key: password
+        STORAGE_CLASS: "longhorn"
     externalDatabase:
       host: "openhands-postgresql"
       port: 5432
