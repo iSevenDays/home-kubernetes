@@ -12,7 +12,7 @@ spec:
     name: openhands
   install:
     remediation:
-      retries: -1
+      retries: 3
   upgrade:
     cleanupOnFail: true
     remediation:
@@ -70,9 +70,22 @@ spec:
               api_key: "os.environ/LLM_API_KEY"
               timeout: 3600
               max_tokens: 20000
-
     runtime-api:
       enabled: true
+      migrationJob:
+        enabled: true
+        initContainers:
+          - name: wait-for-postgres
+            image: postgres:15
+            command:
+              - sh
+              - -c
+              - "until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 2; done"
+      db:
+        host: "openhands-postgresql"
+        name: "openhands"
+        user: "postgres"
+        passwordSecret: "postgres-password"
       startupProbe:
         enabled: true
         initialDelaySeconds: 60
@@ -81,11 +94,9 @@ spec:
       env:
         DB_HOST: "openhands-postgresql"
         DB_NAME: "openhands"
-
     podAnnotations:
-      secret.reloader.stakater.com/reload: |
-        sandbox-api-key,postgres-password,redis,jwt-secret,
-        lite-llm-api-key,keycloak-realm,keycloak-admin,litellm-env-secrets
+      reloader.stakater.com/auto: "true"
+    fullnameOverride: openhands-app
     controller:
       main:
         containers:
