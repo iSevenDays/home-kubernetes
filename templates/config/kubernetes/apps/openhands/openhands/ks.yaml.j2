@@ -27,5 +27,7 @@ spec:
   targetNamespace: openhands
   wait: false
   dependsOn:
+    - name: openhands-keycloak
+    - name: openhands-runtime-api
     - name: openhands-postgresql
     - name: openhands-secrets
