@@ -28,17 +28,13 @@ spec:
     enabled: true
     ingress:
       enabled: false
-    postgresql:
-      auth:
-        existingSecret: postgres-password
-      postMigrate: true
+    externalDatabase:
+      host: "openhands-postgresql"
+      port: 5432
+      database: "openhands"
+      existingSecret: "postgres-password"
     startupProbe:
       enabled: true
       initialDelaySeconds: 60
       periodSeconds: 15
       failureThreshold: 20
-    env:
-      DB_HOST: "openhands-postgresql"
-      DB_NAME: "openhands"
-      DB_USER: "postgres"
-      STORAGE_CLASS: "longhorn"
