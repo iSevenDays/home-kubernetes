@@ -36,3 +36,5 @@ spec:
         memory: "1Gi"
       limits:
         memory: "2Gi"
+    keycloakConfig:
+      enabled: false
