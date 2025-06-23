@@ -21,6 +21,10 @@ spec:
   dependsOn:
     - name: openhands-postgresql
   values:
+    openhands:
+      enabled: false
+    keycloak:
+      enabled: false
     migrationJob:
       enabled: true
       env:

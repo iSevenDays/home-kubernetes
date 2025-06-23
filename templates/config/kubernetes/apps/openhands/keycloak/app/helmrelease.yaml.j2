@@ -7,9 +7,14 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-  chartRef:
-    kind: OCIRepository
-    name: openhands
+  chart:
+    spec:
+      chart: keycloak
+      version: "20.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
   install:
     remediation:
       retries: 3
@@ -21,15 +26,14 @@ spec:
   dependsOn:
     - name: openhands-postgresql
   values:
-    auth:
-      existingSecret: keycloak-admin
-    postgresql:
-      enabled: false
     ingress:
       enabled: false
+    auth:
+      existingSecret: keycloak-admin
     externalDatabase:
-      host: "openhands-postgresql"
+      host: openhands-postgresql
       port: 5432
+      user: postgres
       database: openhands
       existingSecret: postgres-password
     resources:
@@ -37,5 +41,3 @@ spec:
         memory: "1Gi"
       limits:
         memory: "2Gi"
-    keycloakConfig:
-      enabled: false

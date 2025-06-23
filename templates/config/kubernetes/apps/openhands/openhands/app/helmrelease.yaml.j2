@@ -58,29 +58,7 @@ spec:
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
-      enabled: true
-      db:
-        endpoint: "openhands-postgresql"
-        deployStandalone: false
-        useExisting: true
-        database: "openhands"
-        secret:
-          name: postgres-password
-      environmentSecrets:
-        - litellm-env-secrets
-      ingress:
-        enabled: false  # port-forward initially
-      masterkeySecretName: lite-llm-api-key
-      masterkeySecretKey: lite-llm-api-key
-      proxy_config:
-        model_list:
-          - model_name: "prod/default"
-            litellm_params:
-              model: "os.environ/LLM_MODEL"
-              api_base: "os.environ/LLM_BASE_URL"
-              api_key: "os.environ/LLM_API_KEY"
-              timeout: 3600
-              max_tokens: 20000
+      enabled: false
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
