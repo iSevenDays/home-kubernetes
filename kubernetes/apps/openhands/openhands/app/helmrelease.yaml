@@ -100,12 +100,8 @@ spec:
         auth:
           existingSecret: postgres-password
       env:
-        - name: DB_HOST
-          value: "openhands-postgresql"
-        - name: DB_NAME
-          value: "openhands"
-        - name: DB_USER
-          value: "postgres"
-        - name: STORAGE_CLASS
-          value: "longhorn"
+        DB_HOST: "openhands-postgresql"
+        DB_NAME: "openhands"
+        DB_USER: "postgres"
+        STORAGE_CLASS: "longhorn"
 
