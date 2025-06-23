@@ -41,6 +41,13 @@ spec:
         host: "openhands-postgresql"
         port: 5432
         existingSecret: postgres-password
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "2Gi"
+          cpu: "1"
     externalDatabase:
       host: "openhands-postgresql"
       port: 5432
