@@ -11,6 +11,9 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: openhands
   interval: 5m
   retryInterval: 1m
   timeout: 1m
+  dependsOn:
+    - name: openhands
