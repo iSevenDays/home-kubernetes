@@ -48,21 +48,20 @@ spec:
     postgresql:
       enabled: false
     keycloak:
-      externalDatabase:
-        host: "openhands-postgresql"
-        port: 5432
-        existingSecret: postgres-password
-
+      enabled: true
+      postgresql:
+        enabled: false
+      ingress:
+        enabled: false
     externalDatabase:
       host: "openhands-postgresql"
       port: 5432
-      database: "openhands"
-      existingSecret: postgres-password
     redis:
       enabled: true
     sandbox:
       apiHostname: "https://runtime-api.${SECRET_DOMAIN}"
     litellm:
+      enabled: true
       url: "https://llm-proxy.${SECRET_DOMAIN}"
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
@@ -94,6 +93,9 @@ spec:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
     runtime-api:
+      enabled: true
+      ingress:
+        enabled: false
       postgresql:
         auth:
           existingSecret: postgres-password
