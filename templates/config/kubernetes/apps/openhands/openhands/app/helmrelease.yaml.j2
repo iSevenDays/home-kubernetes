@@ -39,16 +39,12 @@ spec:
     runtime-api:
       enabled: false
     openhands:
-      env:
-        DB_HOST: "openhands-postgresql"
-        DB_NAME: "openhands"
-        DB_USER: "postgres"
-        DB_PASS:
-          valueFrom:
-            secretKeyRef:
-              name: postgres-password
-              key: password
-        STORAGE_CLASS: "longhorn"
+      enabled: true
+    externalDatabase:
+      host: "openhands-postgresql"
+      port: 5432
+      database: "openhands"
+      existingSecret: "postgres-password"
     redis:
       enabled: true
     sandbox:
