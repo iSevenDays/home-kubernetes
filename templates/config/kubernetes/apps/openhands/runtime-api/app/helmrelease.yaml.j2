@@ -23,6 +23,11 @@ spec:
   values:
     migrationJob:
       enabled: true
+      env:
+        DB_HOST: "openhands-postgresql"
+        DB_PORT: "5432"
+        DB_NAME: "openhands"
+        DB_USER: "postgres"
     image:
       pullPolicy: Always
     enabled: true
