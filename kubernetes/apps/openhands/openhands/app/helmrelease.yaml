@@ -37,6 +37,10 @@ spec:
         enabled: false
       ingress:
         enabled: false
+      externalDatabase:
+        host: "openhands-postgresql"
+        port: 5432
+        existingSecret: postgres-password
     externalDatabase:
       host: "openhands-postgresql"
     redis:
