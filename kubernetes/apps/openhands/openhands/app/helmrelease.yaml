@@ -37,6 +37,11 @@ spec:
                       - -c
                       - "until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 2; done"
   values:
+    env:
+      DB_HOST: "openhands-postgresql"
+      DB_NAME: "openhands"
+      DB_USER: "postgres"
+      STORAGE_CLASS: "longhorn"
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
     # built-in Ingress and create a separate HTTPRoute manifest (see
@@ -53,14 +58,8 @@ spec:
         enabled: false
       ingress:
         enabled: false
-      externalDatabase:
-        host: "openhands-postgresql"
-        port: 5432
-        database: "openhands"
-        existingSecret: postgres-password
     externalDatabase:
       host: "openhands-postgresql"
-      port: 5432
     redis:
       enabled: true
     sandbox:
@@ -104,9 +103,4 @@ spec:
       postgresql:
         auth:
           existingSecret: postgres-password
-      env:
-        DB_HOST: "openhands-postgresql"
-        DB_NAME: "openhands"
-        DB_USER: "postgres"
-        STORAGE_CLASS: "longhorn"
 
