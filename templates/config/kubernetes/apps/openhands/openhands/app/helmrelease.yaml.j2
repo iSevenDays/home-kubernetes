@@ -71,19 +71,6 @@ spec:
 
     runtime-api:
       enabled: true
-      migrationJob:
-        enabled: true
-        waitForDependencies:
-          - name: openhands-postgresql
-            namespace: openhands
-            type: pod
-            labels:
-              app.kubernetes.io/name: postgresql
-        db:
-          host: "openhands-postgresql"
-          name: "openhands"
-          user: "postgres"
-          passwordSecret: postgres-password
       startupProbe:
         enabled: true
         initialDelaySeconds: 60
@@ -108,3 +95,27 @@ spec:
               initialDelaySeconds: 30
               periodSeconds: 10
               failureThreshold: 15
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: batch
+              version: v1
+              kind: Job
+              name: openhands-runtime-api-migrate-db
+            patch: |-
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                name: openhands-runtime-api-migrate-db
+              spec:
+                template:
+                  spec:
+                    initContainers:
+                      - name: wait-for-postgres
+                        image: postgres:15
+                        command:
+                          - sh
+                          - -c
+                          - "until pg_isready -h openhands-postgresql -p 5432; do echo waiting for db; sleep 2; done"
