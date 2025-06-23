@@ -99,6 +99,11 @@ spec:
         auth:
           existingSecret: postgres-password
         postMigrate: true
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        failureThreshold: 20
       env:
         DB_HOST: "openhands-postgresql"
         DB_NAME: "openhands"
