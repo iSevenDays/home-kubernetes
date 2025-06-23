@@ -43,6 +43,9 @@ spec:
         existingSecret: postgres-password
     externalDatabase:
       host: "openhands-postgresql"
+      port: 5432
+      database: openhands
+      existingSecret: postgres-password
     redis:
       enabled: true
     sandbox:
@@ -88,6 +91,11 @@ spec:
           existingSecret: postgres-password
         postMigrate: true
       env:
+        DB_HOST: "openhands-postgresql"
+        DB_NAME: "openhands"
+        DB_USER: "postgres"
+        STORAGE_CLASS: "longhorn"
+    env:
         DB_HOST: "openhands-postgresql"
         DB_NAME: "openhands"
         DB_USER: "postgres"
