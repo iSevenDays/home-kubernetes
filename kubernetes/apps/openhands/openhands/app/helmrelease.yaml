@@ -29,6 +29,16 @@ spec:
     # ../gateway/route.yaml.j2) that forwards external traffic.
     ingress:
       enabled: false
+    env:
+      DB_HOST: "openhands-postgresql"
+      DB_NAME: "openhands"
+      DB_USER: "postgres"
+      DB_PASS:
+        valueFrom:
+          secretKeyRef:
+            name: postgres-password
+            key: password
+      STORAGE_CLASS: "longhorn"
     tls:
       enabled: true
     postgresql:
@@ -38,18 +48,6 @@ spec:
       url: "https://auth.${SECRET_DOMAIN}"
     runtime-api:
       enabled: false
-    openhands:
-      enabled: true
-      env:
-        DB_HOST: "openhands-postgresql"
-        DB_NAME: "openhands"
-        DB_USER: "postgres"
-        DB_PASS:
-          valueFrom:
-            secretKeyRef:
-              name: postgres-password
-              key: password
-        STORAGE_CLASS: "longhorn"
     externalDatabase:
       host: "openhands-postgresql"
       port: 5432
