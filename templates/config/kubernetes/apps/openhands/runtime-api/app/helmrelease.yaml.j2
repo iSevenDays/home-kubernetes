@@ -9,7 +9,7 @@ spec:
   timeout: 10m
   chartRef:
     kind: OCIRepository
-    name: runtime-api
+    name: openhands
   install:
     remediation:
       retries: 3
@@ -21,9 +21,11 @@ spec:
   dependsOn:
     - name: openhands-postgresql
   values:
-    enabled: true
     migrationJob:
       enabled: true
+    image:
+      pullPolicy: Always
+    enabled: true
     ingress:
       enabled: false
     postgresql:
