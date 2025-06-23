@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openhands-runtime-api
+spec:
+  interval: 15m
+  timeout: 10m
+  chartRef:
+    kind: OCIRepository
+    name: runtime-api
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  releaseName: openhands-runtime-api
+  dependsOn:
+    - name: openhands-postgresql
+  values:
+    enabled: true
+    migrationJob:
+      enabled: true
+    ingress:
+      enabled: false
+    postgresql:
+      auth:
+        existingSecret: postgres-password
+      postMigrate: true
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 15
+      failureThreshold: 20
+    env:
+      DB_HOST: "openhands-postgresql"
+      DB_NAME: "openhands"
+      DB_USER: "postgres"
+      STORAGE_CLASS: "longhorn"

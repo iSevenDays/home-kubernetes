@@ -90,7 +90,7 @@ spec:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
     runtime-api:
-      enabled: true
+      enabled: false
       migrationJob:
         enabled: true
       ingress:
