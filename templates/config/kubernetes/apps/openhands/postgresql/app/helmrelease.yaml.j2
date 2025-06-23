@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: postgresql
-      version: 16.7.13
+      version: 17.7.0
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -25,8 +25,6 @@ spec:
       username: postgres
       database: openhands
       existingSecret: postgres-password
-    image:
-      tag: 16.5.0-debian-11-r0
     primary:
       persistence:
         enabled: true
