@@ -21,7 +21,6 @@ spec:
   dependsOn:
     - name: openhands-postgresql
     - name: openhands-keycloak
-    - name: openhands-runtime-api
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
