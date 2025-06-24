@@ -188,6 +188,11 @@ There are **5 stages** outlined below for completing this project, make sure you
     flux get hr -A
     ```
 
+    to manually reconcile
+    ```sh
+    flux reconcile hr -n openhands openhands-runtime-api
+    ```
+
 3. Check TCP connectivity to both the internal and external gateways:
 
    📍 _`${cluster_gateway_addr}` and `${cloudflare_gateway_addr}` are only placeholders, replace them with your actual values_
@@ -209,7 +214,28 @@ There are **5 stages** outlined below for completing this project, make sure you
     ```sh
     kubectl -n kube-system describe certificates
     ```
+6. How to check helm logs
+    ```sh
+    helm history -n openhands openhands-runtime-api
+    kubectl -n openhands describe helmrelease openhands-runtime-api
+    ```
+7. How to reset database in case of migration failures
+    ```sh
+    helm -n openhands uninstall openhands-runtime-api --no-hooks
+    kubectl scale statefulset -n openhands openhands-postgresql --replicas=0
+    kubectl delete pvc -n openhands data-openhands-postgresql-0
+    kubectl scale statefulset -n openhands openhands-postgresql --replicas=1
 
+    watch for Running
+    kubectl get pod -n openhands -w
+    openhands-postgresql-0                     0/1     ContainerCreating   0             13s
+    flux reconcile hr -n openhands openhands-runtime-api --with-source
+    ```
+
+8. Possible issues with OCI? Check
+    ```sh
+    kubectl get ocirepository openhands -n flux-system -o yaml
+    ```
 ### 🌐 Public DNS
 
 > [!TIP]
