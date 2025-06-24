@@ -7,9 +7,14 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-  chartRef:
-    kind: OCIRepository
-    name: openhands
+  chart:
+    spec:
+      chart: runtime-api
+      version: "0.1.5"
+      sourceRef:
+        kind: HelmRepository
+        name: openhands
+        namespace: flux-system
   install:
     remediation:
       retries: 3
@@ -21,10 +26,6 @@ spec:
   dependsOn:
     - name: openhands-postgresql
   values:
-    openhands:
-      enabled: false
-    keycloak:
-      enabled: false
     migrationJob:
       enabled: true
       env:
@@ -39,14 +40,10 @@ spec:
               key: password
     image:
       pullPolicy: Always
-    enabled: true
     ingress:
       enabled: false
-    externalDatabase:
-      host: "openhands-postgresql"
-      port: 5432
-      database: "openhands"
-      existingSecret: "postgres-password"
+    postgresql:
+      enabled: false
     startupProbe:
       enabled: true
       initialDelaySeconds: 60
