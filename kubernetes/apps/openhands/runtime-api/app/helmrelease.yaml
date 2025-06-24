@@ -37,6 +37,9 @@ spec:
         existingSecret: "postgres-password"
     image:
       pullPolicy: Always
+      tag: "main"
+    imagePullSecrets:
+      - name: ghcr-login-secret
     ingress:
       enabled: false
     startupProbe:
