@@ -62,4 +62,6 @@ spec:
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
+    monitoring:
+      enabled: false
 
