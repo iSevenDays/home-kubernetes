@@ -26,6 +26,7 @@ spec:
   dependsOn:
     - name: openhands-postgresql
   values:
+    runtimeInSameCluster: true
     env:
       DB_HOST: "openhands-postgresql"
       DB_PORT: "5432"
