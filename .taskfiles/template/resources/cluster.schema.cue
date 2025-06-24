@@ -37,6 +37,8 @@ import (
 	openhands_redis_password?: string & !=""
 	docker_username?: string & !=""
 	docker_password?: string & !=""
+	ghcr_username?: string & !=""
+	ghcr_pat?: string & !=""
 
 }
 
