@@ -16,9 +16,11 @@ spec:
         name: openhands
         namespace: flux-system
   install:
+    disableHooks: true
     remediation:
       retries: 3
   upgrade:
+    disableHooks: true
     cleanupOnFail: true
     remediation:
       retries: 3

@@ -1,0 +1,35 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openhands-runtime-api-manual-migration
+spec:
+  template:
+    spec:
+      serviceAccountName: runtime-api-sa
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ghcr-login-secret
+      containers:
+        - name: migrate-db
+          image: "ghcr.io/all-hands-ai/runtime-api:main"
+          command: ["alembic", "upgrade", "head"]
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: DB_HOST
+              value: "openhands-postgresql"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "openhands"
+            - name: DB_USER
+              value: "postgres"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: postgres-password
+  backoffLimit: 4
