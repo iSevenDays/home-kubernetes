@@ -27,6 +27,16 @@ spec:
     - name: openhands-postgresql
   values:
     runtimeInSameCluster: true
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 1
+    cleanup:
+      enabled: false
+    dbCleanup:
+      enabled: false
+    podStatusLogger:
+      enabled: false
     env:
       DB_HOST: "openhands-postgresql"
       DB_PORT: "5432"
