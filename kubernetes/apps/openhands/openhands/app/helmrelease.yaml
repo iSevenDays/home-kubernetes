@@ -43,6 +43,9 @@ spec:
             name: postgres-password
             key: password
       STORAGE_CLASS: "longhorn"
+      SANDBOX_REMOTE_RUNTIME_API_TIMEOUT: "60"
+      LITELLM_DEFAULT_MODEL: "litellm_proxy/prod/claude-3-7-sonnet-20250219"
+      WEB_HOST: "openhands.${SECRET_DOMAIN}"
     tls:
       enabled: true
     postgresql:
@@ -64,4 +67,7 @@ spec:
     fullnameOverride: openhands-app
     monitoring:
       enabled: false
+    appConfig:
+      OPENHANDS_CONFIG_CLS: "server.config.SaaSServerConfig"
+      OPENHANDS_CONVERSATION_VALIDATOR_CLS: "storage.saas_conversation_validator.SaasConversationValidator"
 
