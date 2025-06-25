@@ -236,6 +236,10 @@ There are **5 stages** outlined below for completing this project, make sure you
     ```sh
     kubectl get ocirepository openhands -n flux-system -o yaml
     ```
+9. How to check all values to ensure they are correct and set properly
+    ```sh
+    helm get values openhands -n openhands
+    ```
 ### 🌐 Public DNS
 
 > [!TIP]
@@ -418,7 +422,7 @@ If your workloads require persistent storage with features like replication or c
 - [csi-driver-smb](https://github.com/kubernetes-csi/csi-driver-smb)
 - [synology-csi](https://github.com/SynologyOpenSource/synology-csi)
 
-These tools offer a variety of solutions to meet your persistent storage needs, whether you’re using cloud-native or self-hosted infrastructures.
+These tools offer a variety of solutions to meet your persistent storage needs, whether you're using cloud-native or self-hosted infrastructures.
 
 ### Community Repositories
 
@@ -477,3 +481,46 @@ If this repo is too hot to handle or too cold to hold check out these following 
 ## 🤝 Thanks
 
 Big shout out to all the contributors, sponsors and everyone else who has helped on this project.
+
+## ⚙️ Configuration Management
+
+This project uses `makejinja` to template Kubernetes and Talos configurations. Centralized configuration is managed primarily in the `cluster.yaml` file. This approach allows you to define a variable once and use it across multiple configuration files.
+
+### How to Add a New Configuration Value
+
+1.  **Define the Variable:** Open the `cluster.yaml` file and add your new configuration value. For example, if you want to add a new timeout setting, you would add a line like this:
+
+    ```yaml
+    # cluster.yaml
+    # ... existing content ...
+    new_timeout_value: 3600
+    ```
+
+2.  **Reference the Variable:** In any template file (files ending with `.j2`), you can reference your new variable using the `#{ variable_name }#` syntax. For example, in a `helmrelease.yaml.j2` file:
+
+    ```yaml
+    # templates/config/some/app/helmrelease.yaml.j2
+    apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    # ... other settings ...
+    spec:
+      timeout: #{ new_timeout_value }#s
+      # ... other specs ...
+    ```
+    *Notice how you can combine the variable with other static text like the `s` for seconds.*
+
+3.  **Regenerate Configurations:** After adding or modifying variables, you must run the `task configure` command to apply your changes to the output manifests.
+
+    ```sh
+    task configure
+    ```
+
+4.  **Commit and Push:** Finally, commit the changes to your `cluster.yaml` and the newly generated manifests to your Git repository. Flux will then apply these changes to your cluster.
+
+    ```sh
+    git add -A
+    git commit -m "feat: add and use new_timeout_value"
+    git push
+    ```
+
+This process ensures that your configurations are consistent, version-controlled, and easy to manage.

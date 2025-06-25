@@ -39,7 +39,11 @@ import (
 	docker_password?: string & !=""
 	ghcr_username?: string & !=""
 	ghcr_pat?: string & !=""
-
+	github_app_id?: int & !=0
+	github_app_private_key?: string & !=""
+	github_client_id?: string & !=""
+	github_client_secret?: string & !=""
+	github_webhook_secret?: string & !=""
 }
 
 #Config
