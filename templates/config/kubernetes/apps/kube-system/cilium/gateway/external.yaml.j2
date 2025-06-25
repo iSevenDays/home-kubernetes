@@ -30,6 +30,9 @@ spec:
         namespaces:
           from: All
       tls:
+        mode: Terminate
         certificateRefs:
           - kind: Secret
             name: ${SECRET_DOMAIN/./-}-production-tls
+        options:
+          "gateway.networking.k8s.io/tls-min-version": "1.2"
