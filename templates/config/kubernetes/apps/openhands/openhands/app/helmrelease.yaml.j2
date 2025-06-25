@@ -79,6 +79,9 @@ spec:
         enabled: false  # port-forward initially
       masterkeySecretName: lite-llm-api-key
       masterkeySecretKey: lite-llm-api-key
+      jobAnnotations:
+        "helm.sh/hook": pre-install,pre-upgrade
+        "helm.sh/hook-delete-policy": hook-succeeded
       proxy_config:
         model_list:
           - model_name: "#{ litellm_model }#"
@@ -103,6 +106,4 @@ spec:
     appConfig:
       OPENHANDS_CONFIG_CLS: "server.config.SaaSServerConfig"
       OPENHANDS_CONVERSATION_VALIDATOR_CLS: "storage.saas_conversation_validator.SaasConversationValidator"
-    migrationJob:
-      enabled: false
 
