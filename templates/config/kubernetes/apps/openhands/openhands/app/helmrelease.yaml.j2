@@ -95,6 +95,9 @@ spec:
         endpoint: openhands-postgresql
         secret:
           name: postgres-password
+    jobAnnotations:
+      "helm.sh/hook": pre-install,pre-upgrade
+      "helm.sh/hook-delete-policy": hook-succeeded
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
