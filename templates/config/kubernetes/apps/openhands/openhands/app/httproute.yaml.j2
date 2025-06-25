@@ -11,7 +11,6 @@ spec:
       sectionName: https
   hostnames:
     - "openhands.${SECRET_DOMAIN}"
-    - "auth.${SECRET_DOMAIN}"
     - "auth.openhands.${SECRET_DOMAIN}"
     - "llm-proxy.${SECRET_DOMAIN}"
   rules:
@@ -27,7 +26,6 @@ spec:
           port: 3000
     - matches:
         - hostnames:
-            - "auth.${SECRET_DOMAIN}"
             - "auth.openhands.${SECRET_DOMAIN}"
           path:
             type: PathPrefix
