@@ -33,9 +33,9 @@ spec:
       sectionName: https
   rules:
     - backendRefs:
-        - name: openhands-keycloak
+        - name: keycloak
           namespace: openhands
-          port: 8080
+          port: 80
       matches:
         - path:
             type: PathPrefix
