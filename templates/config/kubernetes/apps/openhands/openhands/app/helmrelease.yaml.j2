@@ -51,8 +51,12 @@ spec:
     postgresql:
       enabled: false
     keycloak:
-      enabled: false
+      enabled: true
       url: "https://auth.openhands.${SECRET_DOMAIN}"
+      externalDatabase:
+        host: "openhands-postgresql"
+        port: 5432
+        existingSecret: "postgres-password"
     redis:
       enabled: true
     litellm:
