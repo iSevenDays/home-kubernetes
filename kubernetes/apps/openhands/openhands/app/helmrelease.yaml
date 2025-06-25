@@ -23,8 +23,6 @@ spec:
     remediation:
       retries: 3
   releaseName: openhands
-  dependsOn:
-    - name: openhands-postgresql
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
