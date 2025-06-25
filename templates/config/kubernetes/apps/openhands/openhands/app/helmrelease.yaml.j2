@@ -73,7 +73,7 @@ spec:
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
-      fullnameOverride: "openhands-litellm"
+      fullnameOverride: "openhands-litellm-{{ .Release.Revision }}"
       enabled: true
       masterkeySecretName: lite-llm-api-key
       masterkeySecretKey: lite-llm-api-key
@@ -93,7 +93,6 @@ spec:
         endpoint: openhands-postgresql
         secret:
           name: postgres-password
-      # This will reclassify the job as a pre-install/pre-upgrade hook and ensure it's deleted upon successful completion, resolving the deployment failure.
       migrationJob:
         ttlSecondsAfterFinished: null
         annotations:
@@ -101,7 +100,7 @@ spec:
           "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
     podAnnotations:
       reloader.stakater.com/auto: "true"
-    fullnameOverride: openhands-app
+    fullnameOverride: "openhands-app-{{ .Release.Revision }}"
     monitoring:
       enabled: false
     appConfig:
