@@ -73,7 +73,7 @@ spec:
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
-      fullnameOverride: "openhands-litellm-{{ .Release.Revision }}"
+      fullnameOverride: "openhands-litellm"
       enabled: true
       masterkeySecretName: lite-llm-api-key
       masterkeySecretKey: lite-llm-api-key
@@ -94,13 +94,10 @@ spec:
         secret:
           name: postgres-password
       migrationJob:
-        ttlSecondsAfterFinished: null
-        annotations:
-          "helm.sh/hook": "pre-install,pre-upgrade"
-          "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+        enabled: false
     podAnnotations:
       reloader.stakater.com/auto: "true"
-    fullnameOverride: "openhands-app-{{ .Release.Revision }}"
+    fullnameOverride: openhands-app
     monitoring:
       enabled: false
     appConfig:
