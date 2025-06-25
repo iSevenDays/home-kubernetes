@@ -233,13 +233,23 @@ There are **5 stages** outlined below for completing this project, make sure you
     ```
 
 8. Possible issues with OCI? Check
+
     ```sh
     kubectl get ocirepository openhands -n flux-system -o yaml
     ```
+
 9. How to check all values to ensure they are correct and set properly
+
     ```sh
     helm get values openhands -n openhands
     ```
+
+10. How to check for litellm deployment
+
+    ```sh
+    kubectl get svc,pods,endpoints -n openhands | grep litellm
+    ```
+
 ### 🌐 Public DNS
 
 > [!TIP]

@@ -75,14 +75,8 @@ spec:
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
-      ingress:
-        enabled: false  # port-forward initially
       masterkeySecretName: lite-llm-api-key
       masterkeySecretKey: lite-llm-api-key
-      migrations:
-        annotations:
-          "helm.sh/hook": pre-install,pre-upgrade
-          "helm.sh/hook-delete-policy": hook-succeeded
       proxy_config:
         model_list:
           - model_name: "openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
