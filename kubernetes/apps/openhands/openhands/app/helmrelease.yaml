@@ -71,7 +71,7 @@ spec:
       enabled: true
       url: "https://llm-proxy.${SECRET_DOMAIN}"
       # Injected from SOPS-encrypted secret rendered from templates
-      teamId: "team-id-redacted"
+      teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
@@ -79,11 +79,11 @@ spec:
       masterkeySecretKey: lite-llm-api-key
       proxy_config:
         model_list:
-          - model_name: "openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
+          - model_name: "${LITELLM_MODEL}"
             litellm_params:
-              model: "openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
-              api_base: "api-base-redacted"
-              api_key: "empty"
+              model: "${LITELLM_MODEL}"
+              api_base: "${LITELLM_BASE_URL}"
+              api_key: "${LITELLM_API_KEY}"
               timeout: 3600
               max_tokens: 20000
       db:

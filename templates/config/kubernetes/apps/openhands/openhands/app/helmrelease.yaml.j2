@@ -71,7 +71,7 @@ spec:
       enabled: true
       url: "https://llm-proxy.${SECRET_DOMAIN}"
       # Injected from SOPS-encrypted secret rendered from templates
-      teamId: "#{ litellm_team_id }#"
+      teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
@@ -79,11 +79,11 @@ spec:
       masterkeySecretKey: lite-llm-api-key
       proxy_config:
         model_list:
-          - model_name: "#{ litellm_model }#"
+          - model_name: "${LITELLM_MODEL}"
             litellm_params:
-              model: "#{ litellm_model }#"
-              api_base: "#{ litellm_base_url }#"
-              api_key: "#{ litellm_api_key }#"
+              model: "${LITELLM_MODEL}"
+              api_base: "${LITELLM_BASE_URL}"
+              api_key: "${LITELLM_API_KEY}"
               timeout: #{ litellm_timeout }#
               max_tokens: #{ litellm_max_output_tokens }#
       db:
