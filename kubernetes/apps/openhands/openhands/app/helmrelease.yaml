@@ -65,6 +65,21 @@ spec:
       ingress:
         enabled: false
         host: "auth.openhands.${SECRET_DOMAIN}"
+      Limits:
+        Cpu: 1500m
+        Memory: 2Gi
+      Requests:
+        Cpu: 250m
+        Memory: 1Gi
+      http:
+        relative-path: /
+      extraEnv: |
+        - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
+          value: "true"
+        - name: KC_PROXY
+          value: "edge"
+        - name: KC_HTTP_RELATIVE_PATH
+          value: "/"
     redis:
       enabled: true
     litellm:
