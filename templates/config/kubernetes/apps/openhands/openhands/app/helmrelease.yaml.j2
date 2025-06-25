@@ -31,18 +31,9 @@ spec:
               kind: Job
               name: keycloak-config
             patch: |-
-              apiVersion: batch/v1
-              kind: Job
-              metadata:
-                name: keycloak-config
-              spec:
-                template:
-                  spec:
-                    containers:
-                      - name: keycloak-config
-                        env:
-                          - name: KEYCLOAK_SERVER_URL
-                            value: http://keycloak
+              - op: replace
+                path: /spec/template/spec/containers/0/env/25/value
+                value: http://keycloak
   releaseName: openhands
   values:
     # The chart provides an Ingress resource but this cluster exposes
