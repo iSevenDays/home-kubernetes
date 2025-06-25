@@ -107,3 +107,6 @@ spec:
       OPENHANDS_CONFIG_CLS: "server.config.SaaSServerConfig"
       OPENHANDS_CONVERSATION_VALIDATOR_CLS: "storage.saas_conversation_validator.SaasConversationValidator"
 
+migrationJob:
+  enabled: false
+
