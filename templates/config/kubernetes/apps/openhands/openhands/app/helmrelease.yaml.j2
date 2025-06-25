@@ -92,10 +92,6 @@ spec:
       Requests:
         Cpu: 250m
         Memory: 1Gi
-      keycloakConfigCli:
-        extraEnvVars:
-          - name: KEYCLOAK_SERVER_URL
-            value: http://keycloak
     redis:
       enabled: true
     litellm:
