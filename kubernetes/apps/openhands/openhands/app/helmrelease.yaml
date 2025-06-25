@@ -95,6 +95,7 @@ spec:
           name: postgres-password
       # This will reclassify the job as a pre-install/pre-upgrade hook and ensure it's deleted upon successful completion, resolving the deployment failure.
       migrationJob:
+        ttlSecondsAfterFinished: null
         annotations:
           "helm.sh/hook": "pre-install,pre-upgrade"
           "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
