@@ -49,7 +49,7 @@ spec:
       enabled: false
     keycloak:
       enabled: true
-      url: "http://keycloak:80"
+      url: "https://auth.openhands.${SECRET_DOMAIN}"
       externalDatabase:
         host: "openhands-postgresql"
         port: 5432
@@ -71,15 +71,6 @@ spec:
       Requests:
         Cpu: 250m
         Memory: 1Gi
-      http:
-        relative-path: /
-      extraEnv: |
-        - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
-          value: "true"
-        - name: KC_PROXY
-          value: "edge"
-        - name: KC_HTTP_RELATIVE_PATH
-          value: "/"
     redis:
       enabled: true
     litellm:
