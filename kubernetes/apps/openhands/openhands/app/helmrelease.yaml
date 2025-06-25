@@ -72,13 +72,13 @@ spec:
       masterkeySecretKey: lite-llm-api-key
       proxy_config:
         model_list:
-          - model_name: "${LLM_MODEL}"
+          - model_name: "openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
             litellm_params:
-              model: "${LLM_MODEL}"
-              api_base: "${LLM_BASE_URL}"
-              api_key: "${LLM_API_KEY}"
-              timeout: ${LLM_TIMEOUT}
-              max_tokens: ${LLM_MAX_OUTPUT_TOKENS}
+              model: "openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
+              api_base: "api-base-redacted"
+              api_key: "empty"
+              timeout: 3600
+              max_tokens: 20000
       db:
         deployStandalone: false
         useExisting: true

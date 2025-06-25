@@ -72,13 +72,13 @@ spec:
       masterkeySecretKey: lite-llm-api-key
       proxy_config:
         model_list:
-          - model_name: "${LLM_MODEL}"
+          - model_name: "#{ litellm_model }#"
             litellm_params:
-              model: "${LLM_MODEL}"
-              api_base: "${LLM_BASE_URL}"
-              api_key: "${LLM_API_KEY}"
-              timeout: ${LLM_TIMEOUT}
-              max_tokens: ${LLM_MAX_OUTPUT_TOKENS}
+              model: "#{ litellm_model }#"
+              api_base: "#{ litellm_base_url }#"
+              api_key: "#{ litellm_api_key }#"
+              timeout: #{ litellm_timeout }#
+              max_tokens: #{ litellm_max_output_tokens }#
       db:
         deployStandalone: false
         useExisting: true
