@@ -71,7 +71,7 @@ spec:
       enabled: true
       url: "https://llm-proxy.${SECRET_DOMAIN}"
       # Injected from SOPS-encrypted secret rendered from templates
-      teamId: "${LITELLM_TEAM_ID}"
+      teamId: "#{ litellm_team_id }#"
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
