@@ -62,6 +62,9 @@ spec:
         limits:
           cpu: "1500m"
           memory: "2Gi"
+      ingress:
+        enabled: false
+        host: "auth.openhands.${SECRET_DOMAIN}"
     redis:
       enabled: true
     litellm:
