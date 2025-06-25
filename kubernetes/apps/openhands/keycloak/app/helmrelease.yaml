@@ -38,6 +38,8 @@ spec:
       existingSecret: postgres-password
     resources:
       requests:
+        cpu: "250m"
         memory: "1Gi"
       limits:
+        cpu: "1500m"
         memory: "2Gi"
