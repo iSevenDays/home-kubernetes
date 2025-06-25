@@ -33,6 +33,7 @@ spec:
     # ../gateway/route.yaml.j2) that forwards external traffic.
     ingress:
       enabled: false
+      host: "openhands.${SECRET_DOMAIN}"
     env:
       DB_HOST: "openhands-postgresql"
       DB_NAME: "openhands"
@@ -45,7 +46,6 @@ spec:
       STORAGE_CLASS: "longhorn"
       SANDBOX_REMOTE_RUNTIME_API_TIMEOUT: "60"
       LITELLM_DEFAULT_MODEL: "litellm_proxy/prod/claude-3-7-sonnet-20250219"
-      WEB_HOST: "openhands.${SECRET_DOMAIN}"
     tls:
       enabled: true
     postgresql:
