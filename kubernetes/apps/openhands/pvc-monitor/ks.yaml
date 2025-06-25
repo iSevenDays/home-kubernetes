@@ -12,8 +12,8 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: openhands
-  interval: 5m
-  retryInterval: 1m
-  timeout: 1m
+  interval: 10m
+  retryInterval: 2m
+  timeout: 2m
   dependsOn:
     - name: openhands
