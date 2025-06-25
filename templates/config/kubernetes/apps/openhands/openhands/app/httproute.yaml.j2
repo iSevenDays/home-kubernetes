@@ -5,59 +5,44 @@ kind: HTTPRoute
 metadata:
   name: openhands
 spec:
-  hostnames: ["openhands.${SECRET_DOMAIN}"]
   parentRefs:
     - name: external
       namespace: kube-system
       sectionName: https
+  hostnames:
+    - "openhands.${SECRET_DOMAIN}"
+    - "auth.${SECRET_DOMAIN}"
+    - "auth.openhands.${SECRET_DOMAIN}"
+    - "llm-proxy.${SECRET_DOMAIN}"
   rules:
-    - backendRefs:
+    - matches:
+        - hostnames:
+            - "openhands.${SECRET_DOMAIN}"
+          path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - name: openhands-service
           namespace: openhands
           port: 3000
-      matches:
-        - path:
+    - matches:
+        - hostnames:
+            - "auth.${SECRET_DOMAIN}"
+            - "auth.openhands.${SECRET_DOMAIN}"
+          path:
             type: PathPrefix
             value: /
----
-# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/gateway.networking.k8s.io/httproute_v1.json
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: keycloak
-spec:
-  hostnames: ["auth.${SECRET_DOMAIN}", "auth.openhands.${SECRET_DOMAIN}"]
-  parentRefs:
-    - name: external
-      namespace: kube-system
-      sectionName: https
-  rules:
-    - backendRefs:
+      backendRefs:
         - name: keycloak
           namespace: openhands
           port: 80
-      matches:
-        - path:
+    - matches:
+        - hostnames:
+            - "llm-proxy.${SECRET_DOMAIN}"
+          path:
             type: PathPrefix
             value: /
----
-# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/gateway.networking.k8s.io/httproute_v1.json
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: litellm-proxy
-spec:
-  hostnames: ["llm-proxy.${SECRET_DOMAIN}"]
-  parentRefs:
-    - name: external
-      namespace: kube-system
-      sectionName: https
-  rules:
-    - backendRefs:
+      backendRefs:
         - name: openhands-litellm-helm-proxy
           namespace: openhands
           port: 4000
-      matches:
-        - path:
-            type: PathPrefix
-            value: /
