@@ -75,6 +75,13 @@ spec:
               api_key: "${litellm_api_key}"
               timeout: ${litellm_timeout}
               max_tokens: ${litellm_max_output_tokens}
+      db:
+        deployStandalone: false
+        useExisting: true
+        database: litellm
+        endpoint: openhands-postgresql
+        secret:
+          name: postgres-password
     podAnnotations:
       reloader.stakater.com/auto: "true"
     fullnameOverride: openhands-app
