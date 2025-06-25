@@ -30,8 +30,3 @@ spec:
   dependsOn:
     - name: openhands-postgresql
     - name: openhands-secrets
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: openhands
-      namespace: openhands
