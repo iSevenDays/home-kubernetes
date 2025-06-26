@@ -40,6 +40,7 @@ spec:
                         env:
                           - name: KEYCLOAK_SERVER_URL
                             value: http://keycloak
+                            $patch: replace
             target:
               kind: Job
               name: keycloak-config
