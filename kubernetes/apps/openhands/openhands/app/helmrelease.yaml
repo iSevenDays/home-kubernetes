@@ -52,11 +52,12 @@ spec:
     # ../gateway/route.yaml.j2) that forwards external traffic.
     ingress:
       enabled: false
-      host: "openhands.${SECRET_DOMAIN}"
+      host: "${SECRET_DOMAIN}"
     env:
       DB_HOST: "openhands-postgresql"
       DB_NAME: "openhands"
       DB_USER: "postgres"
+      AUTH_WEB_HOST: "auth.${SECRET_DOMAIN}"
 # monitor kubectl logs -n flux-system deploy/helm-controller | tail | jq for Warning: spec.template.spec.containers[0].env[48]: hides previous definition of \"DB_PASS\", which may be dropped when using apply
 #      DB_PASS:
 #        valueFrom:

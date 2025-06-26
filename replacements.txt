@@ -1,0 +1,2 @@
+literal:c31ce39c-ad40-4ee6-9d60-2a397d91fd50==>team-id-redacted
+literal:http://192.168.0.24:8080/v1==>api-base-redacted

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flux get hr:*)",
+      "Bash(kubectl get all:*)",
+      "Bash(kubectl -n openhands describe helmrelease openhands)",
+      "Bash(kubectl get events:*)",
+      "Bash(kubectl get:*)",
+      "Bash(helm list:*)",
+      "Bash(flux logs:*)",
+      "Bash(kubectl annotate:*)",
+      "Bash(kubectl logs:*)",
+      "Bash(kubectl describe:*)",
+      "Bash(nslookup:*)",
+      "Bash(curl:*)",
+      "Bash(kubectl exec:*)",
+      "Bash(openssl:*)",
+      "Bash(kubectl run:*)",
+      "Bash(echo)",
+      "Bash(kubectl rollout restart:*)",
+      "Bash(flux reconcile kustomization:*)",
+      "Bash(grep:*)"
+    ],
+    "deny": []
+  }
+}
