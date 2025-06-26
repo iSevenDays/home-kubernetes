@@ -57,8 +57,8 @@ spec:
       DB_HOST: "openhands-postgresql"
       DB_NAME: "openhands"
       DB_USER: "postgres"
-      AUTH_WEB_HOST: "auth.${SECRET_DOMAIN}"
-      KEYCLOAK_SERVER_URL_EXT: "https://auth.${SECRET_DOMAIN}"
+      AUTH_WEB_HOST: "auth.openhands.${SECRET_DOMAIN}"
+      KEYCLOAK_SERVER_URL_EXT: "https://auth.openhands.${SECRET_DOMAIN}"
 # monitor kubectl logs -n flux-system deploy/helm-controller | tail | jq for Warning: spec.template.spec.containers[0].env[48]: hides previous definition of \"DB_PASS\", which may be dropped when using apply
 #      DB_PASS:
 #        valueFrom:
@@ -74,7 +74,7 @@ spec:
       enabled: false
     keycloak:
       enabled: true
-      url: "https://auth.${SECRET_DOMAIN}"
+      url: "https://auth.openhands.${SECRET_DOMAIN}"
       externalDatabase:
         host: "openhands-postgresql"
         port: 5432
