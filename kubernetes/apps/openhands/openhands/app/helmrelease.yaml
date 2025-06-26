@@ -27,10 +27,7 @@ spec:
   postRenderers:
     - kustomize:
         patches:
-          - target:
-              kind: Job
-              name: keycloak-config
-            patch: |-
+          - patch: |-
               apiVersion: batch/v1
               kind: Job
               metadata:
@@ -43,6 +40,9 @@ spec:
                         env:
                           - name: KEYCLOAK_SERVER_URL
                             value: http://keycloak
+            target:
+              kind: Job
+              name: keycloak-config
   releaseName: openhands
   values:
     # The chart provides an Ingress resource but this cluster exposes
