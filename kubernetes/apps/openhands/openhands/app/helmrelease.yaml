@@ -57,11 +57,12 @@ spec:
       DB_HOST: "openhands-postgresql"
       DB_NAME: "openhands"
       DB_USER: "postgres"
-      DB_PASS:
-        valueFrom:
-          secretKeyRef:
-            name: postgres-password
-            key: password
+# monitor kubectl logs -n flux-system deploy/helm-controller | tail | jq for Warning: spec.template.spec.containers[0].env[48]: hides previous definition of \"DB_PASS\", which may be dropped when using apply
+#      DB_PASS:
+#        valueFrom:
+#          secretKeyRef:
+#            name: postgres-password
+#            key: password
       STORAGE_CLASS: "longhorn"
       SANDBOX_REMOTE_RUNTIME_API_TIMEOUT: "60"
       LITELLM_DEFAULT_MODEL: "litellm_proxy/prod/claude-3-7-sonnet-20250219"
