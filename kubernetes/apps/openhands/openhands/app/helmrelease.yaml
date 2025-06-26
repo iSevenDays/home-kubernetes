@@ -24,26 +24,6 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: Job
-              name: keycloak-config
-            patch: |
-              apiVersion: batch/v1
-              kind: Job
-              metadata:
-                name: keycloak-config
-              spec:
-                template:
-                  spec:
-                    containers:
-                      - name: keycloak-config
-                        env:
-                          # overwrite the existing entry
-                          - name: KEYCLOAK_SERVER_URL
-                            value: "http://keycloak"
   releaseName: openhands
   values:
     # The chart provides an Ingress resource but this cluster exposes
@@ -74,7 +54,7 @@ spec:
       enabled: false
     keycloak:
       enabled: true
-      url: "https://auth.openhands.${SECRET_DOMAIN}"
+      url: "http://keycloak"  # Use internal service URL for job connectivity
       externalDatabase:
         host: "openhands-postgresql"
         port: 5432
