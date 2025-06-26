@@ -19,7 +19,10 @@
       "Bash(echo)",
       "Bash(kubectl rollout restart:*)",
       "Bash(flux reconcile kustomization:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(kubectl:*)",
+      "Bash(helm -n openhands get values openhands)",
+      "Bash(helm:*)"
     ],
     "deny": []
   }
