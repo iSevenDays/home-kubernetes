@@ -71,8 +71,8 @@ spec:
     postgresql:
       enabled: false
     keycloak:
-      enabled: false
-      url: "https://auth.openhands.${SECRET_DOMAIN}"
+      enabled: true
+      url: "https://auth.${SECRET_DOMAIN}"
       externalDatabase:
         host: "openhands-postgresql"
         port: 5432
@@ -87,7 +87,7 @@ spec:
           memory: "2Gi"
       ingress:
         enabled: false
-        host: "auth.openhands.${SECRET_DOMAIN}"
+        host: "auth.${SECRET_DOMAIN}"
         annotations: {}
       Limits:
         Cpu: 1500m

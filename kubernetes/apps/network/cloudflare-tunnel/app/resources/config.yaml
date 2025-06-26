@@ -7,7 +7,7 @@ ingress:
     service: &svc https://cilium-gateway-external.kube-system.svc.cluster.local
   - hostname: "openhands.${SECRET_DOMAIN}"
     service: *svc
-  - hostname: "auth.openhands.${SECRET_DOMAIN}"
+  - hostname: "auth.${SECRET_DOMAIN}"
     service: *svc
   - hostname: "*.${SECRET_DOMAIN}"
     service: *svc
