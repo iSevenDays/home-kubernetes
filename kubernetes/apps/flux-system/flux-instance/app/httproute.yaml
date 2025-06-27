@@ -12,6 +12,9 @@ spec:
     - name: external
       namespace: kube-system
       sectionName: https
+    - name: external
+      namespace: kube-system
+      sectionName: http
   rules:
     - backendRefs:
         - name: webhook-receiver
