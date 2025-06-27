@@ -4,7 +4,7 @@ originRequest:
 
 ingress:
   - hostname: "${SECRET_DOMAIN}"
-    service: &svc https://cilium-gateway-external.kube-system.svc.cluster.local
+    service: &svc http://cilium-gateway-external.kube-system.svc.cluster.local
   - hostname: "openhands.${SECRET_DOMAIN}"
     service: *svc
   - hostname: "*.${SECRET_DOMAIN}"
