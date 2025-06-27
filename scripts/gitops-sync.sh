@@ -29,9 +29,9 @@ COMMIT_MSG="$*"
 
 echo "[gitops-sync] Rendering manifests via Taskfile..."
 # Render manifests & encrypt secrets (defined in Taskfile)
-if ! task configure; then
+if ! task configure --yes; then
     echo "[gitops-sync] 'task configure' failed – attempting legacy 'configure' target..."
-    task configure
+    task configure --yes
 fi
 
 echo "[gitops-sync] Staging generated files..."
