@@ -4,6 +4,8 @@ kind: DNSEndpoint
 metadata:
   name: auth-openhands-override
   namespace: openhands
+  annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
 spec:
   endpoints:
     - dnsName: "auth.openhands.${SECRET_DOMAIN}"
