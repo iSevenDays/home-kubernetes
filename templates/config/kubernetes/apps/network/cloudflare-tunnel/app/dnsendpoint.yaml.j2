@@ -12,3 +12,9 @@ spec:
     - dnsName: "openhands.${SECRET_DOMAIN}"
       recordType: CNAME
       targets: ["#{ cloudflare_tunnel_id() }#.cfargotunnel.com"]
+    - dnsName: "llm-proxy.${SECRET_DOMAIN}"
+      recordType: CNAME
+      targets: ["#{ cloudflare_tunnel_id() }#.cfargotunnel.com"]
+    - dnsName: "flux-webhook.${SECRET_DOMAIN}"
+      recordType: CNAME
+      targets: ["#{ cloudflare_tunnel_id() }#.cfargotunnel.com"]
