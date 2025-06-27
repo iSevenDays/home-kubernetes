@@ -5,7 +5,7 @@ kind: HTTPRoute
 metadata:
   name: openhands
   annotations:
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    external-dns.alpha.kubernetes.io/controller: "ignore"
 spec:
   hostnames: ["openhands.${SECRET_DOMAIN}"]
   parentRefs:
@@ -51,7 +51,7 @@ kind: HTTPRoute
 metadata:
   name: litellm-proxy
   annotations:
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    external-dns.alpha.kubernetes.io/controller: "ignore"
 spec:
   hostnames: ["llm-proxy.${SECRET_DOMAIN}"]
   parentRefs:
