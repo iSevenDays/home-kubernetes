@@ -71,6 +71,9 @@ spec:
         enabled: false
         host: "auth.${SECRET_DOMAIN}"
         annotations: {}
+      proxy: "edge"  # Trust X-Forwarded headers from reverse proxy
+      hostname: "auth.openhands.${SECRET_DOMAIN}"
+      hostnameStrict: false
       Limits:
         Cpu: 1500m
         Memory: 2Gi
