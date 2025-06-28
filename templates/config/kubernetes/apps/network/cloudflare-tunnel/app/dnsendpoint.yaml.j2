@@ -9,3 +9,6 @@ spec:
     - dnsName: "external.${SECRET_DOMAIN}"
       recordType: CNAME
       targets: ["#{ cloudflare_tunnel_id() }#.cfargotunnel.com"]
+    - dnsName: "auth.openhands.${SECRET_DOMAIN}"
+      recordType: CNAME
+      targets: ["#{ cloudflare_tunnel_id() }#.cfargotunnel.com"]
