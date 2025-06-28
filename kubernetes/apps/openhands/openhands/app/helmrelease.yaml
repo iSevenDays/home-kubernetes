@@ -46,8 +46,13 @@ spec:
 #            name: postgres-password
 #            key: password
       STORAGE_CLASS: "longhorn"
-      RUNTIME: "docker"  # Override chart default of "remote" to use local Docker runtime
       LITELLM_DEFAULT_MODEL: "litellm_proxy/prod/claude-3-7-sonnet-20250219"
+      # Docker runtime configuration
+      RUNTIME: "docker"
+      SANDBOX_RUNTIME_CONTAINER_IMAGE: "ghcr.io/all-hands-ai/runtime:35426a04d82956e8282f557c4ef75d022804a9f4-nikolaik"
+      SANDBOX_KEEP_RUNTIME_ALIVE: "true"
+      # Remove remote runtime URL to avoid confusion
+      SANDBOX_REMOTE_RUNTIME_API_URL: ""
     tls:
       enabled: true
     postgresql:
