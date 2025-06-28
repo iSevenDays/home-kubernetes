@@ -26,7 +26,7 @@ A Kubernetes cluster deployed with [Talos Linux](https://github.com/siderolabs/t
 
 Does this sound cool to you? If so, continue to read on! 👇
 
-## 🚀 Let's Go!
+## 🚀 Let's Go
 
 There are **5 stages** outlined below for completing this project, make sure you follow the stages in order.
 
@@ -36,6 +36,7 @@ There are **5 stages** outlined below for completing this project, make sure you
 > If you have **3 or more nodes** it is recommended to make 3 of them controller nodes for a highly available control plane. This project configures **all nodes** to be able to run workloads. **Worker nodes** are therefore **optional**.
 >
 > **Minimum system requirements**
+>
 > | Role    | Cores    | Memory        | System Disk               |
 > |---------|----------|---------------|---------------------------|
 > | Control/Worker | 4 | 16GB | 256GB SSD/NVMe |
@@ -189,8 +190,13 @@ There are **5 stages** outlined below for completing this project, make sure you
     ```
 
     to manually reconcile
+
     ```sh
-    flux reconcile hr -n openhands openhands-runtime-api
+    flux reconcile hr -n openhands openhands
+    ```
+
+    ```sh
+    flux reconcile kustomization -n openhands openhands --with-source
     ```
 
 3. Check TCP connectivity to both the internal and external gateways:
@@ -214,12 +220,36 @@ There are **5 stages** outlined below for completing this project, make sure you
     ```sh
     kubectl -n kube-system describe certificates
     ```
+
 6. How to check helm logs
+
     ```sh
     helm history -n openhands openhands
     kubectl -n openhands describe helmrelease openhands
     ```
+
+6.1. In case of issues like
+    ```
+26       Thu Jun 26 13:54:37 2025 failed           openhands-0.1.1 0.9.7       Rollback "openhands" failed: cannot patch "openhands" with kind Deployment: Deployment.apps "openhands" is invalid: spec.template.spec.containers[0].env[47].valueFrom: Invalid value: "": may not be specified when `value` is not empty && cannot patch "openhands-integrations" with kind Deployment: Deployment.apps "openhands-integrations" is invalid: spec.template.spec.containers[0].env[47].valueFrom: Invalid value: "": may not be specified when `value` is not empty && cannot patch "openhands-mcp" with kind Deployment: Deployment.apps "openhands-mcp" is invalid: spec.template.spec.containers[0].env[47].valueFrom: Invalid value: "": may not be specified when `value` is not empty
+    ```
+
+check values using
+    ```sh
+    helm -n openhands get values openhands --revision 26 | head -n 50 | cat
+    helm -n openhands get manifest openhands --revision 26 | awk '/kind: Deployment/,/---/' | head -n 100 | cat
+    helm -n openhands get manifest openhands --revision 26 | grep -n "name: DB_PASS" | head -n 20 | cat
+    865:        - name: DB_PASS
+877:        - name: DB_PASS
+1091:        - name: DB_PASS
+1103:        - name: DB_PASS
+1317:        - name: DB_PASS
+1329:        - name: DB_PASS
+helm -n openhands get manifest openhands --revision 26 | sed -n '855,890p' | cat
+helm -n openhands get manifest openhands --revision 26 | sed -n '870,80p' | cat
+    ```
+
 7. How to reset database in case of migration failures
+
     ```sh
     helm -n openhands uninstall openhands-runtime-api --no-hooks
     kubectl scale statefulset -n openhands openhands-postgresql --replicas=0
@@ -229,7 +259,7 @@ There are **5 stages** outlined below for completing this project, make sure you
     watch for Running
     kubectl get pod -n openhands -w
     openhands-postgresql-0                     0/1     ContainerCreating   0             13s
-    flux reconcile hr -n openhands openhands-runtime-api --with-source
+    flux reconcile hr -n openhands openhands --with-source
     ```
 
 8. Possible issues with OCI? Check
@@ -249,6 +279,26 @@ There are **5 stages** outlined below for completing this project, make sure you
     ```sh
     kubectl get svc,pods,endpoints -n openhands | grep litellm
     ```
+
+11. How to check http routes after deployment
+
+    ```sh
+    kubectl get httproute -n openhands openhands -o yaml
+    kubectl get httproute -n openhands keycloak -o yaml
+    ```
+
+12. List everything Helm is still installing.
+
+    ```sh
+    kubectl get all,secret,cm,pvc -n openhands \
+
+  -l app.kubernetes.io/instance=openhands
+    ```
+13. List flux errors in Helm release notes
+    ```sh
+    flux logs --level=error --since=10m | grep openhands
+    ```
+\
 
 ### 🌐 Public DNS
 
@@ -494,7 +544,7 @@ This project uses `makejinja` to template Kubernetes and Talos configurations. C
 
 ### How to Add a New Configuration Value
 
-1.  **Define the Variable:** Open the `cluster.yaml` file and add your new configuration value. For example, if you want to add a new timeout setting, you would add a line like this:
+1. **Define the Variable:** Open the `cluster.yaml` file and add your new configuration value. For example, if you want to add a new timeout setting, you would add a line like this:
 
     ```yaml
     # cluster.yaml
@@ -502,7 +552,7 @@ This project uses `makejinja` to template Kubernetes and Talos configurations. C
     new_timeout_value: 3600
     ```
 
-2.  **Reference the Variable:** In any template file (files ending with `.j2`), you can reference your new variable using the `#{ variable_name }#` syntax. For example, in a `helmrelease.yaml.j2` file:
+2. **Reference the Variable:** In any template file (files ending with `.j2`), you can reference your new variable using the `#{ variable_name }#` syntax. For example, in a `helmrelease.yaml.j2` file:
 
     ```yaml
     # templates/config/some/app/helmrelease.yaml.j2
@@ -513,15 +563,16 @@ This project uses `makejinja` to template Kubernetes and Talos configurations. C
       timeout: #{ new_timeout_value }#s
       # ... other specs ...
     ```
-    *Notice how you can combine the variable with other static text like the `s` for seconds.*
 
-3.  **Regenerate Configurations:** After adding or modifying variables, you must run the `task configure` command to apply your changes to the output manifests.
+    _Notice how you can combine the variable with other static text like the `s` for seconds._
+
+3. **Regenerate Configurations:** After adding or modifying variables, you must run the `task configure` command to apply your changes to the output manifests.
 
     ```sh
     task configure
     ```
 
-4.  **Commit and Push:** Finally, commit the changes to your `cluster.yaml` and the newly generated manifests to your Git repository. Flux will then apply these changes to your cluster.
+4. **Commit and Push:** Finally, commit the changes to your `cluster.yaml` and the newly generated manifests to your Git repository. Flux will then apply these changes to your cluster.
 
     ```sh
     git add -A
