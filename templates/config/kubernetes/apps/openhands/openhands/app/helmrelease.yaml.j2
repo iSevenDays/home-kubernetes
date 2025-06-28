@@ -47,6 +47,8 @@ spec:
 #            key: password
       STORAGE_CLASS: "longhorn"
       LITELLM_DEFAULT_MODEL: "litellm_proxy/prod/claude-3-7-sonnet-20250219"
+      # Override chart's hardcoded RUNTIME=remote
+      RUNTIME: "docker"
     tls:
       enabled: true
     postgresql:
@@ -128,8 +130,4 @@ spec:
     appConfig:
       OPENHANDS_CONFIG_CLS: "server.config.SaaSServerConfig"
       OPENHANDS_CONVERSATION_VALIDATOR_CLS: "storage.saas_conversation_validator.SaasConversationValidator"
-      # Override runtime type from chart default "remote" to "docker"
-      RUNTIME: "docker"
-      SANDBOX_RUNTIME_CONTAINER_IMAGE: "ghcr.io/all-hands-ai/runtime:35426a04d82956e8282f557c4ef75d022804a9f4-nikolaik"
-      SANDBOX_KEEP_RUNTIME_ALIVE: "true"
 
