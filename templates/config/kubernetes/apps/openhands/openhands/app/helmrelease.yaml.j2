@@ -107,6 +107,9 @@ spec:
                         value: "http://127.0.0.1"
                       - name: SANDBOX_REMOTE_RUNTIME_API_TIMEOUT
                         value: "180"
+                      # Force runtime containers to use internal MCP service instead of external endpoint
+                      - name: MCP_HOST
+                        value: "openhands-mcp-service.openhands.svc.cluster.local:3000"
                     # Add volumes
                     volumes:
                     - name: docker-storage
