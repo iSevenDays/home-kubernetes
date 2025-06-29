@@ -44,7 +44,7 @@ spec:
                     containers:
                     # Add DinD sidecar container
                     - name: docker-daemon
-                      image: docker:27-dind
+                      image: docker:28-dind
                       env:
                       - name: DOCKER_TLS_CERTDIR
                         value: ""
