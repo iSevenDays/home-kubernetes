@@ -9,77 +9,74 @@ spec:
   template:
     spec:
       containers:
-        # Add DinD sidecar container
-        - name: docker-daemon
-          image: docker:27-dind
-          env:
-            - name: DOCKER_TLS_CERTDIR
-              value: ""
-            - name: DOCKER_HOST
-              value: "tcp://0.0.0.0:2375"
-          securityContext:
-            privileged: true
-          ports:
-            - containerPort: 2375
-              name: docker-api
-              protocol: TCP
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "2Gi"
-              cpu: "1000m"
-          volumeMounts:
-            - name: docker-storage
-              mountPath: /var/lib/docker
-          command:
-            - "/bin/sh"
-            - "-c"
-            - |
-              echo "Starting Docker daemon for OpenHands runtime..."
-              dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
-              DOCKERD_PID=$!
-
-              echo "Waiting for Docker daemon to start..."
-              timeout=60
-              while [ $timeout -gt 0 ]; do
-                if docker info >/dev/null 2>&1; then
-                  echo "Docker daemon ready for OpenHands runtime containers"
-                  break
-                fi
-                sleep 1
-                timeout=$((timeout-1))
-              done
-
-              if [ $timeout -eq 0 ]; then
-                echo "FAILED: Docker daemon did not start"
-                exit 1
-              fi
-
-              echo "DinD sidecar ready, waiting for main process..."
-              wait $DOCKERD_PID
-
-        # Patch main OpenHands container to use DinD
-        - name: openhands
-          env:
-            - name: DOCKER_HOST
-              value: "tcp://127.0.0.1:2375"
-            - name: RUNTIME
-              value: "docker"
-            # Add additional environment variables for DinD runtime networking
-            - name: SANDBOX_RUNTIME_BINDING_ADDRESS
-              value: "127.0.0.1" # Bind to localhost for security
-            - name: DOCKER_HOST_ADDR
-              value: "127.0.0.1" # Override host.docker.internal with localhost
-            - name: SANDBOX_LOCAL_RUNTIME_URL
-              value: "http://127.0.0.1" # Set local runtime URL to localhost
-            # Force runtime containers to use internal MCP service instead of external endpoint
-            - name: MCP_SERVER_HOST
-              value: "openhands-mcp-service.openhands.svc.cluster.local:3000"
-
+      # Add DinD sidecar container
+      - name: docker-daemon
+        image: docker:27-dind
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""
+        - name: DOCKER_HOST
+          value: "tcp://0.0.0.0:2375"
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 2375
+          name: docker-api
+          protocol: TCP
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: docker-storage
+          mountPath: /var/lib/docker
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          echo "Starting Docker daemon for OpenHands runtime..."
+          dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
+          DOCKERD_PID=$!
+          
+          echo "Waiting for Docker daemon to start..."
+          timeout=60
+          while [ $timeout -gt 0 ]; do
+            if docker info >/dev/null 2>&1; then
+              echo "Docker daemon ready for OpenHands runtime containers"
+              break
+            fi
+            sleep 1
+            timeout=$((timeout-1))
+          done
+          
+          if [ $timeout -eq 0 ]; then
+            echo "FAILED: Docker daemon did not start"
+            exit 1
+          fi
+          
+          echo "DinD sidecar ready, waiting for main process..."
+          wait $DOCKERD_PID
+      
+      # Patch main OpenHands container to use DinD
+      - name: openhands
+        env:
+        - name: DOCKER_HOST
+          value: "tcp://127.0.0.1:2375"
+        - name: RUNTIME
+          value: "docker"
+        # Add additional environment variables for DinD runtime networking
+        - name: SANDBOX_RUNTIME_BINDING_ADDRESS
+          value: "127.0.0.1"  # Bind to localhost for security
+        - name: DOCKER_HOST_ADDR
+          value: "127.0.0.1"  # Override host.docker.internal with localhost
+        - name: SANDBOX_LOCAL_RUNTIME_URL
+          value: "http://127.0.0.1"  # Set local runtime URL to localhost
+      
       # Add volume for Docker storage
       volumes:
-        - name: docker-storage
-          emptyDir:
-            sizeLimit: "20Gi"
+      - name: docker-storage
+        emptyDir:
+          sizeLimit: "20Gi"
