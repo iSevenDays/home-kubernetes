@@ -5,3 +5,10 @@ resources:
   - ./secret.sops.yaml
   - ./helmrelease.yaml
   - ./httproute.yaml
+
+# Strategic merge patches for DinD sidecar integration
+patches:
+- path: dind-sidecar-patch.yaml
+  target:
+    kind: Deployment
+    name: openhands
