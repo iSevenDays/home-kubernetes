@@ -115,14 +115,6 @@ spec:
                     - name: docker-storage
                       emptyDir:
                         sizeLimit: "20Gi"
-          # JSON patch to replace MCP_HOST environment variable to use internal service
-          - target:
-              kind: Deployment
-              name: openhands
-            patch: |
-              - op: replace
-                path: /spec/template/spec/containers/0/env/7/value
-                value: "openhands-mcp-service.openhands.svc.cluster.local:3000"
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
@@ -145,6 +137,8 @@ spec:
 #            key: password
       STORAGE_CLASS: "longhorn"
       LITELLM_DEFAULT_MODEL: "litellm_proxy/openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
+      # Override MCP_HOST to use internal service instead of external domain
+      MCP_HOST: "openhands-mcp-service.openhands.svc.cluster.local:3000"
       # Note: RUNTIME and networking variables are now set via postRenderer patches
     tls:
       enabled: true
