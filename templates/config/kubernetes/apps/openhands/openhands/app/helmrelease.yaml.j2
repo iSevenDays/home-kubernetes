@@ -29,100 +29,87 @@ spec:
   postRenderers:
     - kustomize:
         patches:
-          # Add DinD sidecar container and modify main container environment
+          # Strategic merge patch to add DinD sidecar and environment variables
           - target:
               kind: Deployment
               name: openhands
             patch: |
-              - op: add
-                path: /spec/template/spec/containers/-
-                value:
-                  name: docker-daemon
-                  image: docker:27-dind
-                  env:
-                    - name: DOCKER_TLS_CERTDIR
-                      value: ""
-                    - name: DOCKER_HOST
-                      value: "tcp://0.0.0.0:2375"
-                  securityContext:
-                    privileged: true
-                  ports:
-                    - containerPort: 2375
-                      name: docker-api
-                      protocol: TCP
-                  resources:
-                    requests:
-                      memory: "512Mi"
-                      cpu: "250m"
-                    limits:
-                      memory: "2Gi"
-                      cpu: "1000m"
-                  volumeMounts:
-                    - name: docker-storage
-                      mountPath: /var/lib/docker
-                  command:
-                    - "/bin/sh"
-                    - "-c"
-                    - |
-                      echo "Starting Docker daemon for OpenHands runtime..."
-                      dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
-                      DOCKERD_PID=$!
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: openhands
+              spec:
+                template:
+                  spec:
+                    containers:
+                    # Add DinD sidecar container
+                    - name: docker-daemon
+                      image: docker:27-dind
+                      env:
+                      - name: DOCKER_TLS_CERTDIR
+                        value: ""
+                      - name: DOCKER_HOST
+                        value: "tcp://0.0.0.0:2375"
+                      securityContext:
+                        privileged: true
+                      ports:
+                      - containerPort: 2375
+                        name: docker-api
+                        protocol: TCP
+                      resources:
+                        requests:
+                          memory: "512Mi"
+                          cpu: "250m"
+                        limits:
+                          memory: "2Gi"
+                          cpu: "1000m"
+                      volumeMounts:
+                      - name: docker-storage
+                        mountPath: /var/lib/docker
+                      command:
+                      - "/bin/sh"
+                      - "-c"
+                      - |
+                        echo "Starting Docker daemon for OpenHands runtime..."
+                        dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
+                        DOCKERD_PID=$!
 
-                      echo "Waiting for Docker daemon to start..."
-                      timeout=60
-                      while [ $timeout -gt 0 ]; do
-                        if docker info >/dev/null 2>&1; then
-                          echo "Docker daemon ready for OpenHands runtime containers"
-                          break
+                        echo "Waiting for Docker daemon to start..."
+                        timeout=60
+                        while [ $timeout -gt 0 ]; do
+                          if docker info >/dev/null 2>&1; then
+                            echo "Docker daemon ready for OpenHands runtime containers"
+                            break
+                          fi
+                          sleep 1
+                          timeout=$((timeout-1))
+                        done
+
+                        if [ $timeout -eq 0 ]; then
+                          echo "FAILED: Docker daemon did not start"
+                          exit 1
                         fi
-                        sleep 1
-                        timeout=$((timeout-1))
-                      done
 
-                      if [ $timeout -eq 0 ]; then
-                        echo "FAILED: Docker daemon did not start"
-                        exit 1
-                      fi
-
-                      echo "DinD sidecar ready, waiting for main process..."
-                      wait $DOCKERD_PID
-              # Add Docker storage volume
-              - op: add
-                path: /spec/template/spec/volumes/-
-                value:
-                  name: docker-storage
-                  emptyDir:
-                    sizeLimit: "20Gi"
-          # Patch main OpenHands container environment variables
-          - target:
-              kind: Deployment
-              name: openhands
-            patch: |
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: DOCKER_HOST
-                  value: "tcp://127.0.0.1:2375"
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: RUNTIME
-                  value: "docker"
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: SANDBOX_RUNTIME_BINDING_ADDRESS
-                  value: "127.0.0.1"
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: DOCKER_HOST_ADDR
-                  value: "127.0.0.1"
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: SANDBOX_LOCAL_RUNTIME_URL
-                  value: "http://127.0.0.1"
+                        echo "DinD sidecar ready, waiting for main process..."
+                        wait $DOCKERD_PID
+                    # Patch main OpenHands container (assuming it's the first container)
+                    - name: openhands
+                      env:
+                      - name: DOCKER_HOST
+                        value: "tcp://127.0.0.1:2375"
+                      - name: RUNTIME
+                        value: "docker"
+                      - name: SANDBOX_RUNTIME_BINDING_ADDRESS
+                        value: "127.0.0.1"
+                      - name: DOCKER_HOST_ADDR
+                        value: "127.0.0.1"
+                      - name: SANDBOX_LOCAL_RUNTIME_URL
+                        value: "http://127.0.0.1"
+                    # Add volumes
+                    volumes:
+                    - name: docker-storage
+                      emptyDir:
+                        sizeLimit: "20Gi"
   values:
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
