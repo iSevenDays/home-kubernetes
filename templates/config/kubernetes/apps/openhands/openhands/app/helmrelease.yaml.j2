@@ -47,12 +47,7 @@ spec:
 #            key: password
       STORAGE_CLASS: "longhorn"
       LITELLM_DEFAULT_MODEL: "litellm_proxy/prod/claude-3-7-sonnet-20250219"
-      # Override chart's hardcoded RUNTIME=remote
-      RUNTIME: "docker"
-      # Fix DinD runtime container networking
-      DOCKER_HOST_ADDR: "127.0.0.1"
-      SANDBOX_LOCAL_RUNTIME_URL: "http://127.0.0.1"
-      SANDBOX_RUNTIME_BINDING_ADDRESS: "127.0.0.1"
+      # Note: RUNTIME and networking variables are set via Kustomize patch
     tls:
       enabled: true
     postgresql:
