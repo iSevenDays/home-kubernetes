@@ -8,7 +8,7 @@ resources:
 
 # Strategic merge patches for DinD sidecar integration
 patches:
-- path: manual-dind-patch.yaml
+- path: dind-sidecar-patch.yaml
   target:
     kind: Deployment
     name: openhands

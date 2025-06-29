@@ -67,9 +67,13 @@ spec:
           value: "tcp://127.0.0.1:2375"
         - name: RUNTIME
           value: "docker"
-        # Add any additional environment variables for DinD runtime
+        # Add additional environment variables for DinD runtime networking
         - name: SANDBOX_RUNTIME_BINDING_ADDRESS
           value: "127.0.0.1"  # Bind to localhost for security
+        - name: DOCKER_HOST_ADDR
+          value: "127.0.0.1"  # Override host.docker.internal with localhost
+        - name: SANDBOX_LOCAL_RUNTIME_URL
+          value: "http://127.0.0.1"  # Set local runtime URL to localhost
       
       # Add volume for Docker storage
       volumes:
