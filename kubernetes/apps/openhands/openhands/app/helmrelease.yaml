@@ -184,7 +184,7 @@ spec:
       enabled: true
     litellm:
       enabled: true
-      url: "https://llm-proxy.${SECRET_DOMAIN}"
+      url: "http://openhands-litellm.openhands.svc.cluster.local:4000"
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
     litellm-helm:
