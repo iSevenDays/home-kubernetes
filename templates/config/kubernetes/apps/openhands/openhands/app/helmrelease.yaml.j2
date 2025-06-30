@@ -203,6 +203,11 @@ spec:
       url: "http://openhands-litellm.openhands.svc.cluster.local:4000"
       # Injected from SOPS-encrypted secret rendered from templates
       teamId: "${LITELLM_TEAM_ID}"
+      hosts:
+        - host: "openhands-litellm.openhands.svc.cluster.local"
+          paths:
+          - path: /
+            pathType: Prefix
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
