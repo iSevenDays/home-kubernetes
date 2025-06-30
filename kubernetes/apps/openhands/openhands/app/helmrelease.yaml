@@ -208,6 +208,10 @@ spec:
           paths:
           - path: /
             pathType: Prefix
+      tls:
+        - secretName: llm-proxy-tls
+          hosts:
+          - "openhands-litellm.openhands.svc.cluster.local"
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
