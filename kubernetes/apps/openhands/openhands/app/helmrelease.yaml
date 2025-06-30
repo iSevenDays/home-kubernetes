@@ -107,9 +107,9 @@ spec:
                         value: "http://127.0.0.1"
                       - name: SANDBOX_REMOTE_RUNTIME_API_TIMEOUT
                         value: "180"
-                      # Force runtime containers to use internal MCP service instead of external endpoint
+                      # Force runtime containers to use external HTTPS MCP endpoint
                       - name: MCP_HOST
-                        value: "openhands-mcp-service.openhands.svc.cluster.local:3000"
+                        value: "mcp-proxy.${SECRET_DOMAIN}"
                     # Add volumes
                     volumes:
                     - name: docker-storage
@@ -137,8 +137,8 @@ spec:
 #            key: password
       STORAGE_CLASS: "longhorn"
       LITELLM_DEFAULT_MODEL: "litellm_proxy/openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
-      # Override MCP_HOST to use internal service instead of external domain
-      MCP_HOST: "openhands-mcp-service.openhands.svc.cluster.local:3000"
+      # Override MCP_HOST to use external HTTPS domain (through gateway)
+      MCP_HOST: "mcp-proxy.${SECRET_DOMAIN}"
       # Note: RUNTIME and networking variables are now set via postRenderer patches
     tls:
       enabled: true
