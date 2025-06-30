@@ -217,6 +217,16 @@ spec:
       enabled: true
       masterkeySecretName: lite-llm-api-key
       masterkeySecretKey: lite-llm-api-key
+      ingress:
+        hosts:
+        - host: openhands-litellm.openhands.svc.cluster.local
+          paths:
+          - path: /
+            pathType: Prefix
+        tls:
+        - secretName: llm-proxy-tls
+          hosts:
+          - openhands-litellm.openhands.svc.cluster.local
       env:
         UI_USERNAME: "admin"
         UI_PASSWORD: "ZZbOHfyJ7o5GFPrcOtV8khqNTbMrhoNm"
