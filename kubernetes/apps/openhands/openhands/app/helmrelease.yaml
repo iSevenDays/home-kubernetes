@@ -239,6 +239,7 @@ spec:
               api_key: "${LITELLM_API_KEY}"
               timeout: 3600
               max_tokens: 20000
+              context_window: 131072
       db:
         deployStandalone: false
         useExisting: true
