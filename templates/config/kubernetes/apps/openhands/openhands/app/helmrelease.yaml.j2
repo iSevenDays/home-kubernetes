@@ -50,6 +50,11 @@ spec:
                         value: ""
                       - name: DOCKER_HOST
                         value: "tcp://0.0.0.0:2375"
+                      # Pass LLM configuration to DinD so runtime containers inherit it
+                      - name: LITELLM_BASE_URL
+                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+                      - name: LLM_BASE_URL
+                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
                       securityContext:
                         privileged: true
                       ports:
@@ -71,6 +76,7 @@ spec:
                       - "-c"
                       - |
                         echo "Starting Docker daemon for OpenHands runtime..."
+                        echo "LLM Configuration: LITELLM_BASE_URL=${LITELLM_BASE_URL}, LLM_BASE_URL=${LLM_BASE_URL}"
                         dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
                         DOCKERD_PID=$!
 
@@ -117,6 +123,11 @@ spec:
                       - name: LLM_BASE_URL
                         value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
                       - name: LITELLM_BASE_URL
+                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+                      # Additional LLM configuration variables OpenHands might use
+                      - name: SANDBOX_LLM_BASE_URL
+                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+                      - name: RUNTIME_LLM_BASE_URL
                         value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
                     # Add volumes
                     volumes:
