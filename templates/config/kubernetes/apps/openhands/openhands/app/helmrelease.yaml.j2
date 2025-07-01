@@ -76,7 +76,7 @@ spec:
                       - "-c"
                       - |
                         echo "Starting Docker daemon for OpenHands runtime..."
-                        echo "LLM Configuration: LITELLM_BASE_URL=${LITELLM_BASE_URL}, LLM_BASE_URL=${LLM_BASE_URL}"
+                        echo "LLM Configuration: LITELLM_BASE_URL=${LITELLM_BASE_URL}, LLM_BASE_URL=${LLM_BASE_URL}, LLM_MAX_INPUT_TOKENS=${LLM_MAX_INPUT_TOKENS}"
                         dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
                         DOCKERD_PID=$!
 
