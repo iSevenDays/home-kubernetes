@@ -33,6 +33,7 @@ import (
 	litellm_api_key?: string & !=""
 	litellm_timeout?: int & !=0
 	litellm_max_output_tokens?: int & !=0
+	litellm_context_window?: int & !=0
 	openhands_pg_password?: string & !=""
 	openhands_redis_password?: string & !=""
 	docker_username?: string & !=""
