@@ -29,6 +29,13 @@ spec:
     # Enable in-cluster Kubernetes authentication (perfect for Talos)
     runtimeInSameCluster: true
     
+    # Reduce replicas for resource-constrained cluster
+    replicaCount: 1
+    
+    # Disable autoscaling to prevent resource issues
+    autoscaling:
+      enabled: false
+    
     env:
       # Database configuration for separate runtime_api_db
       DB_HOST: "openhands-postgresql"
@@ -125,6 +132,15 @@ spec:
       initialDelaySeconds: 60
       periodSeconds: 15
       failureThreshold: 20
+    
+    # Resource configuration - reduced for resource-constrained cluster
+    resources:
+      requests:
+        cpu: "250m"       # Reduced from 1000m
+        memory: "1Gi"     # Reduced from 4Gi
+      limits:
+        cpu: "500m"       # Reduced from 1000m  
+        memory: "2Gi"     # Reduced from 4Gi
     
     # Monitoring
     monitoring:
