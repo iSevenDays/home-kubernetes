@@ -79,6 +79,10 @@ spec:
         existingSecret: "postgres-password"
         passwordKey: "password"
     
+    # External database configuration
+    database:
+      secretName: "runtime-api-db-credentials"
+    
     # Image configuration
     image:
       tag: "sha-77dd418"
