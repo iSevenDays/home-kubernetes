@@ -63,10 +63,10 @@ spec:
                         protocol: TCP
                       resources:
                         requests:
-                          memory: "768Mi"
-                          cpu: "250m"
+                          memory: "1536Mi"
+                          cpu: "500m"
                         limits:
-                          memory: "3Gi"
+                          memory: "4Gi"
                           cpu: "1000m"
                       volumeMounts:
                       - name: docker-storage
@@ -217,7 +217,7 @@ spec:
           value: "edge"
         - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
           value: "true"
-      Limits:
+      limits:
         Cpu: 1500m
         Memory: 2Gi
       Requests:
