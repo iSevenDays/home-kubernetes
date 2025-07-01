@@ -20,12 +20,12 @@ spec:
             - name: DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: openhands-postgresql
+                  name: postgres-password
                   key: username
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: openhands-postgresql
+                  name: postgres-password
                   key: password
             - name: DATABASE_HOST
               value: openhands-postgresql

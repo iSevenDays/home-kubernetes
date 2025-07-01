@@ -51,6 +51,7 @@ spec:
       INGRESS_CLASS: "cilium"
       STORAGE_CLASS: "longhorn"
       RUNTIME_BASE_URL: "runtime-api.${SECRET_DOMAIN}"
+      RUNTIME_DOMAIN: "${SECRET_DOMAIN}"
       
       # Resource configuration
       MEMORY_REQUEST: "2048Mi"
