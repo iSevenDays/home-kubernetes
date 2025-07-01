@@ -38,10 +38,15 @@ spec:
     
     env:
       # Database configuration for separate runtime_api_db
-      DB_HOST: "openhands-postgresql"
-      DB_PORT: "5432"
-      DB_NAME: "runtime_api_db"  # Separate database for runtime-api
-      DB_USER: "postgres"
+      DATABASE_HOST: "openhands-postgresql"
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: "runtime_api_db"  # Separate database for runtime-api
+      DATABASE_USERNAME: "postgres"
+      DATABASE_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: postgres-password
+            key: password
       
       # Kubernetes runtime configuration for Talos
       RUNTIME_IN_SAME_CLUSTER: "true"
