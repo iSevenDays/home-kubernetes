@@ -47,6 +47,9 @@ spec:
         auth:
           existingSecret: postgres-password
 
+      migrationJob:
+        enabled: true
+
       env:
         # Enable in-cluster Kubernetes authentication (perfect for Talos)
         RUNTIME_IN_SAME_CLUSTER: "true"
