@@ -265,13 +265,6 @@ spec:
               api_key: "${LITELLM_API_KEY}"
               timeout: #{ litellm_timeout }#
               max_tokens: #{ litellm_max_output_tokens }#
-              context_window: #{ litellm_context_window }#
-            model_info:
-              max_tokens: #{ litellm_max_output_tokens }#
-              context_window: #{ litellm_context_window }#
-        litellm_settings:
-          max_tokens: #{ litellm_max_output_tokens }#
-          context_window: #{ litellm_context_window }#
       db:
         deployStandalone: false
         useExisting: true

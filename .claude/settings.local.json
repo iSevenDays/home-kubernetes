@@ -22,7 +22,13 @@
       "Bash(grep:*)",
       "Bash(kubectl:*)",
       "Bash(helm -n openhands get values openhands)",
-      "Bash(helm:*)"
+      "Bash(helm:*)",
+      "Bash(dig:*)",
+      "Bash(find:*)",
+      "Bash(flux get kustomizations:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.all-hands.dev)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
