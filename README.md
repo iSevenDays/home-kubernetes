@@ -228,6 +228,37 @@ There are **5 stages** outlined below for completing this project, make sure you
     kubectl -n openhands describe helmrelease openhands
     ```
 
+7. How to check cluster resource allocation
+
+    Check current CPU and memory usage across all nodes:
+    
+    ```sh
+    kubectl top nodes
+    ```
+    
+    Check detailed resource allocation for each control plane node:
+    
+    ```sh
+    kubectl describe node talos-control1 | grep -A10 "Allocated resources:"
+    kubectl describe node talos-control2 | grep -A10 "Allocated resources:"
+    kubectl describe node talos-control3 | grep -A10 "Allocated resources:"
+    ```
+    
+    Or check all nodes at once:
+    
+    ```sh
+    kubectl describe nodes | grep -A10 "Allocated resources:"
+    ```
+    
+    Example output shows resource usage like:
+    ```
+    Resource           Requests      Limits
+    cpu                3294m (83%)   7100m (179%)
+    memory             7698Mi (50%)  12096Mi (78%)
+    ```
+    
+    📍 _Monitor these percentages to ensure workloads can be scheduled. High CPU/memory requests may prevent pod scheduling._
+
 6.1. In case of issues like
     ```
 26       Thu Jun 26 13:54:37 2025 failed           openhands-0.1.1 0.9.7       Rollback "openhands" failed: cannot patch "openhands" with kind Deployment: Deployment.apps "openhands" is invalid: spec.template.spec.containers[0].env[47].valueFrom: Invalid value: "": may not be specified when `value` is not empty && cannot patch "openhands-integrations" with kind Deployment: Deployment.apps "openhands-integrations" is invalid: spec.template.spec.containers[0].env[47].valueFrom: Invalid value: "": may not be specified when `value` is not empty && cannot patch "openhands-mcp" with kind Deployment: Deployment.apps "openhands-mcp" is invalid: spec.template.spec.containers[0].env[47].valueFrom: Invalid value: "": may not be specified when `value` is not empty
