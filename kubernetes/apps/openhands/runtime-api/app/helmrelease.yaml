@@ -1,0 +1,138 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openhands-runtime-api
+spec:
+  interval: 15m
+  timeout: 10m
+  chart:
+    spec:
+      chart: runtime-api
+      version: "0.1.5" #crane ls ghcr.io/all-hands-ai/helm-charts/runtime-api
+      sourceRef:
+        kind: HelmRepository
+        name: openhands
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  releaseName: openhands-runtime-api
+  dependsOn:
+    - name: openhands-postgresql
+  values:
+    # Enable in-cluster Kubernetes authentication (perfect for Talos)
+    runtimeInSameCluster: true
+    
+    env:
+      # Database configuration for separate runtime_api_db
+      DB_HOST: "openhands-postgresql"
+      DB_PORT: "5432"
+      DB_NAME: "runtime_api_db"  # Separate database for runtime-api
+      DB_USER: "postgres"
+      
+      # Kubernetes runtime configuration for Talos
+      RUNTIME_IN_SAME_CLUSTER: "true"
+      K8S_NAMESPACE: "openhands"
+      
+      # Infrastructure configuration for Talos
+      INGRESS_CLASS: "cilium"
+      STORAGE_CLASS: "longhorn"
+      RUNTIME_BASE_URL: "runtime-api.${SECRET_DOMAIN}"
+      
+      # Resource configuration
+      MEMORY_REQUEST: "2048Mi"
+      CPU_REQUEST: "1000m"
+      PERSISTENT_STORAGE_SIZE: "10Gi"
+      
+      # Security and performance
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      DEV_MODE: "false"
+      
+      # Do NOT set cloud provider variables for Talos
+      # GCP_PROJECT: ""    # Leave unset for non-GKE clusters
+      # AWS_REGION: ""     # Leave unset for non-EKS clusters
+    
+    # Database configuration (using shared PostgreSQL instance)
+    postgresql:
+      enabled: false  # Use shared PostgreSQL
+      auth:
+        existingSecret: "postgres-password"
+    
+    # Image configuration
+    image:
+      tag: "sha-77dd418"
+      pullPolicy: Always
+    
+    imagePullSecrets:
+      - name: ghcr-login-secret
+    
+    # Ingress configuration for runtime-api
+    ingress:
+      enabled: true
+      host: "runtime-api.${SECRET_DOMAIN}"
+      className: "cilium"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    
+    # Migration job configuration
+    migrationJob:
+      enabled: true
+    
+    # Warm runtimes configuration with VS Code support
+    warmRuntimes:
+      enabled: true
+      count: 1
+      configs:
+        - name: default
+          image: "ghcr.io/all-hands-ai/runtime:3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
+          working_dir: "/openhands/code/"
+          command:
+            - /openhands/micromamba/bin/micromamba
+            - run
+            - -n
+            - openhands
+            - poetry
+            - run
+            - python
+            - -u
+            - -m
+            - openhands.runtime.action_execution_server
+            - "60000"
+            - --working-dir
+            - /workspace
+            - --plugins
+            - agent_skills
+            - jupyter
+            - vscode  # VS Code support built-in!
+            - --username
+            - root
+            - --user-id
+            - "0"
+          environment:
+            LITELLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+            LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+    
+    # Health checks
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 15
+      failureThreshold: 20
+    
+    # Monitoring
+    monitoring:
+      enabled: false
+    
+    # Cleanup configuration
+    cleanup:
+      enabled: true
+      schedule: "*/5 * * * *"
+      idle_seconds: 1800  # 30 minutes
+      dead_seconds: 86400  # 1 day
