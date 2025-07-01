@@ -102,3 +102,29 @@ spec:
         - path:
             type: PathPrefix
             value: /
+---
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: runtime-api
+  annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+spec:
+  hostnames: ["runtime-api.openhands.redacted", "*.runtime-api.openhands.redacted"]
+  parentRefs:
+    - name: external
+      namespace: kube-system
+      sectionName: https
+    - name: external
+      namespace: kube-system
+      sectionName: http
+  rules:
+    - backendRefs:
+        - name: runtime-api
+          namespace: openhands
+          port: 5000
+      matches:
+        - path:
+            type: PathPrefix
+            value: /

@@ -13,3 +13,23 @@ spec:
       targets:
         - "192.168.0.184"
       setIdentifier: "main-override"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: runtime-api-override
+  namespace: openhands
+  annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+spec:
+  endpoints:
+    - dnsName: "#{ runtime_api_domain }#"
+      recordType: A
+      targets:
+        - "192.168.0.184"
+      setIdentifier: "runtime-api-override"
+    - dnsName: "*.#{ runtime_api_domain }#"
+      recordType: A
+      targets:
+        - "192.168.0.184"
+      setIdentifier: "runtime-api-wildcard-override"

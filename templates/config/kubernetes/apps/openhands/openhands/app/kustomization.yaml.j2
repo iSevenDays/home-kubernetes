@@ -5,11 +5,5 @@ resources:
   - ./secret.sops.yaml
   - ./helmrelease.yaml
   - ./httproute.yaml
-
-# Strategic merge patches for DinD sidecar integration
-# TODO: Re-enable after main deployment is created
-# patches:
-# - path: dind-sidecar-patch.yaml
-#   target:
-#     kind: Deployment
-#     name: openhands
+  - ./main-dns-override.yaml
+  - ./migration-job.yaml

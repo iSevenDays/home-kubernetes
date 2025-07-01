@@ -25,115 +25,7 @@ spec:
   uninstall:
     keepHistory: false
   releaseName: openhands
-  # PostRenderer to add DinD sidecar configuration
-  postRenderers:
-    - kustomize:
-        patches:
-          # Strategic merge patch to add DinD sidecar and environment variables
-          - target:
-              kind: Deployment
-              name: openhands
-            patch: |
-              apiVersion: apps/v1
-              kind: Deployment
-              metadata:
-                name: openhands
-              spec:
-                template:
-                  spec:
-                    containers:
-                    # Add DinD sidecar container
-                    - name: docker-daemon
-                      image: docker:27-dind
-                      env:
-                      - name: DOCKER_TLS_CERTDIR
-                        value: ""
-                      - name: DOCKER_HOST
-                        value: "tcp://0.0.0.0:2375"
-                      # Pass LLM configuration to DinD so runtime containers inherit it
-                      - name: LITELLM_BASE_URL
-                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-                      - name: LLM_BASE_URL
-                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-                      securityContext:
-                        privileged: true
-                      ports:
-                      - containerPort: 2375
-                        name: docker-api
-                        protocol: TCP
-                      resources:
-                        requests:
-                          memory: "768Mi"
-                          cpu: "250m"
-                        limits:
-                          memory: "3Gi"
-                          cpu: "1000m"
-                      volumeMounts:
-                      - name: docker-storage
-                        mountPath: /var/lib/docker
-                      command:
-                      - "/bin/sh"
-                      - "-c"
-                      - |
-                        echo "Starting Docker daemon for OpenHands runtime..."
-                        echo "LLM Configuration: LITELLM_BASE_URL=${LITELLM_BASE_URL}, LLM_BASE_URL=${LLM_BASE_URL}, LLM_MAX_INPUT_TOKENS=${LLM_MAX_INPUT_TOKENS}"
-                        dockerd --host=tcp://0.0.0.0:2375 --host=unix:///var/run/docker.sock --tls=false &
-                        DOCKERD_PID=$!
-
-                        echo "Waiting for Docker daemon to start..."
-                        timeout=60
-                        while [ $timeout -gt 0 ]; do
-                          if docker info >/dev/null 2>&1; then
-                            echo "Docker daemon ready for OpenHands runtime containers"
-                            break
-                          fi
-                          sleep 1
-                          timeout=$((timeout-1))
-                        done
-
-                        if [ $timeout -eq 0 ]; then
-                          echo "FAILED: Docker daemon did not start"
-                          exit 1
-                        fi
-
-                        echo "DinD sidecar ready, waiting for main process..."
-                        wait $DOCKERD_PID
-                    # Patch main OpenHands container (assuming it's the first container)
-                    - name: openhands
-                      env:
-                      - name: DOCKER_HOST
-                        value: "tcp://127.0.0.1:2375"
-                      - name: RUNTIME
-                        value: "docker"
-                      - name: SANDBOX_RUNTIME_BINDING_ADDRESS
-                        value: "127.0.0.1"
-                      - name: DOCKER_HOST_ADDR
-                        value: "127.0.0.1"
-                      - name: SANDBOX_LOCAL_RUNTIME_URL
-                        value: "http://127.0.0.1"
-                      - name: SANDBOX_REMOTE_RUNTIME_API_TIMEOUT
-                        value: "180"
-                      # Force runtime containers to use external HTTPS MCP endpoint
-                      - name: MCP_HOST
-                        value: "mcp-proxy.${SECRET_DOMAIN}"
-                      # Set AUTH_WEB_HOST for proper Keycloak integration
-                      - name: AUTH_WEB_HOST
-                        value: "auth.openhands.${SECRET_DOMAIN}"
-                      # Force runtime containers to use internal LLM service
-                      - name: LLM_BASE_URL
-                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-                      - name: LITELLM_BASE_URL
-                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-                      # Additional LLM configuration variables OpenHands might use
-                      - name: SANDBOX_LLM_BASE_URL
-                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-                      - name: RUNTIME_LLM_BASE_URL
-                        value: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-                    # Add volumes
-                    volumes:
-                    - name: docker-storage
-                      emptyDir:
-                        sizeLimit: "20Gi"
+  # No postRenderers needed - using native runtime-api instead of DinD
   values:
     # Override image tags to match 0.47.0 release (PR #71)
     image:
@@ -145,21 +37,80 @@ spec:
         repository: ghcr.io/all-hands-ai/runtime
         tag: "3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
 
+    # Enable runtime-api for native Kubernetes runtime support
     runtime-api:
+      enabled: true
       image:
         tag: "sha-77dd418"
+
+      env:
+        # Enable in-cluster Kubernetes authentication (perfect for Talos)
+        RUNTIME_IN_SAME_CLUSTER: "true"
+        K8S_NAMESPACE: "openhands"
+
+        # Configure for Talos infrastructure
+        INGRESS_CLASS: "cilium"
+        RUNTIME_BASE_URL: "#{ runtime_api_domain }#"
+        STORAGE_CLASS: "longhorn"
+        PERSISTENT_STORAGE_SIZE: "10Gi"
+
+        # Resource configuration
+        MEMORY_REQUEST: "2048Mi"
+        CPU_REQUEST: "1000m"
+        RUNTIME_CLASS: ""  # Use default runtime class
+
+        # Session and cleanup configuration
+        SESSION_TIMEOUT: "3600"  # 1 hour session timeout
+        POD_CLEANUP_TIMEOUT: "300"  # 5 minutes cleanup timeout
+
+        # Do NOT set cloud provider variables for Talos
+        # GCP_PROJECT: ""    # Leave unset
+        # AWS_REGION: ""     # Leave unset
+
+      ingress:
+        enabled: true
+        host: "#{ runtime_api_domain }#"
+        className: "cilium"
+        annotations:
+          cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
       warmRuntimes:
+        enabled: true
         count: 1
         configs:
           - name: default
             image: "ghcr.io/all-hands-ai/runtime:3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
             working_dir: "/openhands/code/"
-            environment: {}
+            environment:
+              # Pass LLM configuration to runtime containers
+              LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+              LITELLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+            plugins:
+              - agent_skills
+              - jupyter
+              - vscode  # VS Code support built-in!
             command:
-              - "bash"
-              - "-c"
-              - |
-                cd /openhands && python -m openhands.runtime.action_execution_server
+              - /openhands/micromamba/bin/micromamba
+              - run
+              - -n
+              - openhands
+              - poetry
+              - run
+              - python
+              - -u
+              - -m
+              - openhands.runtime.action_execution_server
+              - "60000"
+              - --working-dir
+              - /workspace
+              - --plugins
+              - agent_skills
+              - jupyter
+              - vscode
+              - --username
+              - root
+              - --user-id
+              - "0"
 
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
@@ -168,25 +119,42 @@ spec:
     ingress:
       enabled: false
       host: "${SECRET_DOMAIN}"
+
     env:
+      # Database configuration
       DB_HOST: "openhands-postgresql"
       DB_NAME: "openhands"
       DB_USER: "postgres"
+
+      # Authentication configuration
       KEYCLOAK_SERVER_URL_EXT: "https://auth.openhands.${SECRET_DOMAIN}"
-# monitor kubectl logs -n flux-system deploy/helm-controller | tail | jq for Warning: spec.template.spec.containers[0].env[48]: hides previous definition of \"DB_PASS\", which may be dropped when using apply
-#      DB_PASS:
-#        valueFrom:
-#          secretKeyRef:
-#            name: postgres-password
-#            key: password
+      AUTH_WEB_HOST: "auth.openhands.${SECRET_DOMAIN}"
+
+      # Runtime configuration - use remote runtime-api
+      RUNTIME: "remote"
+      SANDBOX_REMOTE_RUNTIME_API_URL: "https://#{ runtime_api_domain }#"
+      SANDBOX_REMOTE_RUNTIME_API_TIMEOUT: "180"
+
+      # MCP configuration
+      MCP_HOST: "mcp-proxy.${SECRET_DOMAIN}"
+
+      # Storage configuration
       STORAGE_CLASS: "longhorn"
+
+      # LLM configuration
       LITELLM_DEFAULT_MODEL: "litellm_proxy/openai/ubergarm/DeepSeek-R1-0528-IQ3_K_R4"
       LLM_MAX_INPUT_TOKENS: "131072"
-      # Note: RUNTIME, MCP_HOST, and AUTH_WEB_HOST are now set via postRenderer patches
+      LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+      LITELLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+      SANDBOX_LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+      RUNTIME_LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
+
     tls:
       enabled: true
+
     postgresql:
       enabled: false
+
     keycloak:
       enabled: true
       url: "http://keycloak"  # Use internal service URL for job connectivity
@@ -223,8 +191,10 @@ spec:
       Requests:
         Cpu: 250m
         Memory: 1Gi
+
     redis:
       enabled: true
+
     litellm:
       enabled: true
       url: "http://openhands-litellm.openhands.svc.cluster.local:4000"
@@ -239,6 +209,7 @@ spec:
         - secretName: llm-proxy-tls
           hosts:
           - "openhands-litellm.openhands.svc.cluster.local"
+
     litellm-helm:
       fullnameOverride: "openhands-litellm"
       enabled: true
@@ -276,11 +247,15 @@ spec:
           name: postgres-password
       migrationJob:
         enabled: false
+
     podAnnotations:
       reloader.stakater.com/auto: "true"
+
     fullnameOverride: openhands-app
+
     monitoring:
       enabled: false
+
     appConfig:
       OPENHANDS_CONFIG_CLS: "server.config.SaaSServerConfig"
       OPENHANDS_CONVERSATION_VALIDATOR_CLS: "storage.saas_conversation_validator.SaasConversationValidator"
