@@ -258,7 +258,7 @@ spec:
         UI_PASSWORD: "ZZbOHfyJ7o5GFPrcOtV8khqNTbMrhoNm"
       proxy_config:
         model_list:
-          - model_name: "${LITELLM_MODEL}"
+          - model_name: "litellm_proxy/${LITELLM_MODEL}"
             litellm_params:
               model: "${LITELLM_MODEL}"
               api_base: "${LITELLM_BASE_URL}"
