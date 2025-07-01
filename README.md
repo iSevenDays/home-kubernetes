@@ -290,15 +290,27 @@ helm -n openhands get manifest openhands --revision 26 | sed -n '870,80p' | cat
 12. List everything Helm is still installing.
 
     ```sh
-    kubectl get all,secret,cm,pvc -n openhands \
-
-  -l app.kubernetes.io/instance=openhands
+    kubectl get all,secret,cm,pvc -n openhands -l app.kubernetes.io/instance=openhands
     ```
+
 13. List flux errors in Helm release notes
+
     ```sh
     flux logs --level=error --since=10m | grep openhands
     ```
-\
+
+14. Check if helm update succeeded
+
+    ```sh
+    kubectl get helmrelease -n openhands openhands -o jsonpath='{.status.conditions[?(@.type=="Ready")]}' | jq
+    ```
+
+15. To check deployed version of openhands helm
+
+    ```sh
+    kubectl get helmrelease -n openhands openhands -o yaml | grep -A 10 -B 5 "chart\|version\|image" || echo "OpenHands not deployed or kubectl not available"
+    kubectl get pods -n openhands -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{range .spec.containers[*]}{.image}{" "}{end}{"\n"}{end}' | column -t
+    ```
 
 ### 🌐 Public DNS
 
@@ -509,6 +521,106 @@ Community member [@whazor](https://github.com/whazor) created [Kubesearch](https
   3. Support is limited to this project and does not extend to unrelated tools or custom feature development.
 
 </details>
+
+## 🤖 OpenHands Docker Runtime Solution
+
+This cluster includes a working deployment of [OpenHands](https://github.com/All-Hands-AI/OpenHands), an AI-powered coding assistant, with a **Docker-in-Docker (DinD) runtime solution** specifically designed for Talos Kubernetes environments.
+
+### The Challenge
+
+OpenHands requires Docker daemon access to create runtime containers for code execution. However, Talos Linux uses containerd instead of Docker, making standard Docker socket mounting approaches incompatible.
+
+### Our Solution: DinD Sidecar Architecture
+
+```
+OpenHands Container → tcp://127.0.0.1:2375 → DinD Sidecar → Runtime Containers
+```
+
+**Key Components:**
+
+- **Main OpenHands Container**: Runs the web application and AI assistant
+- **DinD Sidecar Container**: Provides Docker daemon via `docker:27-dind` image
+- **TCP Communication**: Secure localhost-only Docker API access
+- **Dynamic Runtime Containers**: Created inside DinD for each conversation session
+
+### Implementation Details
+
+**PostRenderer Solution:**
+The DinD sidecar is implemented using Flux HelmRelease `postRenderers` with Kustomize strategic merge patches. This approach modifies the Helm chart output to add the sidecar container and environment variables without requiring chart modifications.
+
+**Pod Configuration:**
+
+```yaml
+# Shows 2/2 Running (OpenHands + DinD sidecar)
+kubectl get pods -n openhands
+openhands-66c8998c7f-cpzx6  2/2  Running
+```
+
+**Environment Variables:**
+
+- `RUNTIME=docker` - Enables Docker runtime mode
+- `DOCKER_HOST=tcp://127.0.0.1:2375` - Points to DinD sidecar
+- `SANDBOX_RUNTIME_BINDING_ADDRESS=127.0.0.1` - Localhost binding for security
+- `DOCKER_HOST_ADDR=127.0.0.1` - Override host.docker.internal with localhost
+- `SANDBOX_LOCAL_RUNTIME_URL=http://127.0.0.1` - Local runtime URL
+
+**Resources:**
+
+- **DinD Sidecar**: 512Mi-2Gi memory, 250m-1000m CPU, privileged security context
+- **Docker Storage**: 20Gi ephemeral volume for container images and data
+
+### How Runtime Containers Work
+
+When you create a conversation in OpenHands:
+
+1. **Container Creation**: OpenHands calls Docker API → DinD creates runtime container
+2. **Naming**: `openhands-runtime-{session_id}` (e.g., `openhands-runtime-d2a6463622b04fe0af52a514ff3c837a`)
+3. **Networking**: Dynamic port allocation (e.g., ports 31640, 34547)
+4. **Lifecycle**: Containers are ephemeral - created per session, destroyed when done
+
+**Important**: Runtime containers exist **inside the DinD sidecar**, not as separate Kubernetes pods. They don't appear in `kubectl get pods` but can be seen with:
+
+```bash
+kubectl exec -c docker-daemon openhands-pod -- docker ps
+```
+
+### Security Considerations
+
+- **Privileged DinD**: Required for Docker daemon functionality
+- **Localhost Binding**: Docker API only accessible within the pod
+- **Resource Limits**: Prevents resource exhaustion
+- **Ephemeral Storage**: Runtime containers use temporary storage
+
+### Deployment Method
+
+The DinD sidecar is deployed using **Flux HelmRelease PostRenderers** with Kustomize strategic merge patches. This approach:
+
+1. **Modifies Helm Output**: PostRenderers apply patches to the Helm chart output before deployment
+2. **No Chart Modifications**: Works with the upstream OpenHands chart without requiring forks
+3. **GitOps Compatible**: Fully declarative and managed through Flux
+4. **Automatic Updates**: Patches are applied automatically during Helm upgrades
+
+```yaml
+# In HelmRelease spec:
+postRenderers:
+  - kustomize:
+      patches:
+        - target:
+            kind: Deployment
+            name: openhands
+          patch: |
+            # Strategic merge patch adds DinD sidecar and environment variables
+```
+
+This approach successfully resolves the "Failed to create agent session: ConnectError" issue that prevented OpenHands from working on Talos Kubernetes.
+
+### Verification
+
+**Success Indicators:**
+
+- Pod status: `2/2 Running`
+- Logs show: `Container started: openhands-runtime-{session_id}`
+- Conversations can be created and execute code successfully
 
 ## 🙌 Related Projects
 
