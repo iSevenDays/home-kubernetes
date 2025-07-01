@@ -135,6 +135,32 @@ spec:
                       emptyDir:
                         sizeLimit: "20Gi"
   values:
+    # Override image tags to match 0.47.0 release (PR #71)
+    image:
+      repository: ghcr.io/all-hands-ai/deploy
+      tag: "0.47.0"
+
+    runtime:
+      image:
+        repository: ghcr.io/all-hands-ai/runtime
+        tag: "3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
+
+    runtime-api:
+      image:
+        tag: "sha-77dd418"
+      warmRuntimes:
+        count: 1
+        configs:
+          - name: default
+            image: "ghcr.io/all-hands-ai/runtime:3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
+            working_dir: "/openhands/code/"
+            environment: {}
+            command:
+              - "bash"
+              - "-c"
+              - |
+                cd /openhands && python -m openhands.runtime.action_execution_server
+
     # The chart provides an Ingress resource but this cluster exposes
     # services via Gateway API HTTPRoutes.  We therefore disable the
     # built-in Ingress and create a separate HTTPRoute manifest (see
