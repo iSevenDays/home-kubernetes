@@ -63,10 +63,10 @@ spec:
                         protocol: TCP
                       resources:
                         requests:
-                          memory: "3Gi"
-                          cpu: "500m"
+                          memory: "768Mi"
+                          cpu: "250m"
                         limits:
-                          memory: "6Gi"
+                          memory: "3Gi"
                           cpu: "1000m"
                       volumeMounts:
                       - name: docker-storage
