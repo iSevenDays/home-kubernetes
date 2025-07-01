@@ -50,8 +50,8 @@ spec:
       # Infrastructure configuration for Talos
       INGRESS_CLASS: "cilium"
       STORAGE_CLASS: "longhorn"
-      RUNTIME_BASE_URL: "runtime-api.${SECRET_DOMAIN}"
-      RUNTIME_DOMAIN: "${SECRET_DOMAIN}"
+      RUNTIME_BASE_URL: "#{ runtime_api_domain }#"
+      RUNTIME_DOMAIN: "#{ cloudflare_domain }#"
       
       # Resource configuration
       MEMORY_REQUEST: "2048Mi"
@@ -84,7 +84,7 @@ spec:
     # Ingress configuration for runtime-api
     ingress:
       enabled: true
-      host: "runtime-api.${SECRET_DOMAIN}"
+      host: "#{ runtime_api_domain }#"
       className: "cilium"
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
