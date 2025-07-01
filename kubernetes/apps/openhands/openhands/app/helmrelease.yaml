@@ -243,6 +243,9 @@ spec:
             model_info:
               max_tokens: 20000
               context_window: 131072
+        litellm_settings:
+          max_tokens: 20000
+          context_window: 131072
       db:
         deployStandalone: false
         useExisting: true
