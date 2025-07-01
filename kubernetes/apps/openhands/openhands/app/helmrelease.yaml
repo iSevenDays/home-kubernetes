@@ -63,10 +63,10 @@ spec:
                         protocol: TCP
                       resources:
                         requests:
-                          memory: "512Mi"
+                          memory: "768Mi"
                           cpu: "250m"
                         limits:
-                          memory: "2Gi"
+                          memory: "3Gi"
                           cpu: "1000m"
                       volumeMounts:
                       - name: docker-storage
@@ -197,10 +197,10 @@ spec:
       resources:
         requests:
           cpu: "250m"
-          memory: "1Gi"
+          memory: "1.5Gi"
         limits:
           cpu: "1500m"
-          memory: "2Gi"
+          memory: "3Gi"
       ingress:
         enabled: false
         host: "auth.${SECRET_DOMAIN}"
