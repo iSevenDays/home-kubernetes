@@ -58,6 +58,13 @@ spec:
       # environment variables for all workloads.  Explicit overrides
       # here were causing malformed env vars and have been removed.
 
+      # CRITICAL FIX: Chart does NOT automatically inject DB_* variables
+      # from database.secretName. Must add manually for all workloads.
+      DB_HOST: "openhands-postgresql"
+      DB_NAME: "runtime_api_db"
+      DB_USER: "postgres"
+      # DB_PASS automatically provided by chart from postgres-password secret
+
       # Security and performance
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONUNBUFFERED: "1"
