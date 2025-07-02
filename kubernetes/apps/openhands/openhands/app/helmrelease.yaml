@@ -57,7 +57,7 @@ spec:
 
         # Configure for Talos infrastructure
         INGRESS_CLASS: "cilium"
-        RUNTIME_BASE_URL: "runtime-api.openhands.redacted"
+        RUNTIME_BASE_URL: "runtime-api.openhands.sevendays.cloud"
         STORAGE_CLASS: "longhorn"
         PERSISTENT_STORAGE_SIZE: "10Gi"
 
@@ -84,7 +84,7 @@ spec:
 
       ingress:
         enabled: true
-        host: "runtime-api.openhands.redacted"
+        host: "runtime-api.openhands.sevendays.cloud"
         className: "cilium"
         annotations:
           cert-manager.io/cluster-issuer: "letsencrypt-prod"
@@ -135,6 +135,10 @@ spec:
       enabled: false
       host: "${SECRET_DOMAIN}"
 
+    # Override sandbox configuration to prevent dummy URL
+    sandbox:
+      apiHostname: "https://runtime-api.openhands.sevendays.cloud"
+
     env:
       # Database configuration
       DB_HOST: "openhands-postgresql"
@@ -143,15 +147,14 @@ spec:
 
       # Authentication configuration
       KEYCLOAK_SERVER_URL_EXT: "https://auth.openhands.${SECRET_DOMAIN}"
-      AUTH_WEB_HOST: "auth.openhands.${SECRET_DOMAIN}"
+      AUTH_WEB_HOST: "auth.openhands.${SECRET_DOMAIN}"  # Override chart default "keycloak"
 
       # Runtime configuration - use remote runtime-api
-      RUNTIME: "remote"
-      SANDBOX_REMOTE_RUNTIME_API_URL: "https://runtime-api.openhands.redacted"
+      # RUNTIME: Chart hardcodes this to "remote" - no need to duplicate
       SANDBOX_REMOTE_RUNTIME_API_TIMEOUT: "180"
 
       # MCP configuration
-      MCP_HOST: "mcp-proxy.${SECRET_DOMAIN}"
+      MCP_HOST: "mcp-proxy.${SECRET_DOMAIN}"  # Override chart default "${SECRET_DOMAIN}"
 
       # Storage configuration
       STORAGE_CLASS: "longhorn"

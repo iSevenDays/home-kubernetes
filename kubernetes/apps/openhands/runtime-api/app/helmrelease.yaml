@@ -55,8 +55,8 @@ spec:
       # Infrastructure configuration for Talos
       INGRESS_CLASS: "cilium"
       STORAGE_CLASS: "longhorn"
-      RUNTIME_BASE_URL: "runtime-api.openhands.redacted"
-      RUNTIME_DOMAIN: "redacted"
+      RUNTIME_BASE_URL: "runtime-api.openhands.sevendays.cloud"
+      RUNTIME_DOMAIN: "sevendays.cloud"
       
       # Resource configuration
       MEMORY_REQUEST: "2048Mi"
@@ -94,7 +94,7 @@ spec:
     # Ingress configuration for runtime-api
     ingress:
       enabled: true
-      host: "runtime-api.openhands.redacted"
+      host: "runtime-api.openhands.sevendays.cloud"
       className: "cilium"
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod

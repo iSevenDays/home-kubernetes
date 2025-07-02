@@ -23,12 +23,12 @@ metadata:
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
 spec:
   endpoints:
-    - dnsName: "runtime-api.openhands.redacted"
+    - dnsName: "runtime-api.openhands.sevendays.cloud"
       recordType: A
       targets:
         - "192.168.0.184"
       setIdentifier: "runtime-api-override"
-    - dnsName: "*.runtime-api.openhands.redacted"
+    - dnsName: "*.runtime-api.openhands.sevendays.cloud"
       recordType: A
       targets:
         - "192.168.0.184"

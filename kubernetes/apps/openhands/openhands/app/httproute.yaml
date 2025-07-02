@@ -111,7 +111,7 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
 spec:
-  hostnames: ["runtime-api.openhands.redacted", "*.runtime-api.openhands.redacted"]
+  hostnames: ["runtime-api.openhands.sevendays.cloud", "*.runtime-api.openhands.sevendays.cloud"]
   parentRefs:
     - name: external
       namespace: kube-system
