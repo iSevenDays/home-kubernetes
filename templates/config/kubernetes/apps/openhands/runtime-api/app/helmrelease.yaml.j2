@@ -169,3 +169,9 @@ spec:
       schedule: "*/5 * * * *"
       idle_seconds: 1800  # 30 minutes
       dead_seconds: 86400  # 1 day
+      extraEnv:
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-password
+              key: password
