@@ -148,7 +148,7 @@ spec:
       # Authentication configuration
       KEYCLOAK_SERVER_URL_EXT: "https://auth.openhands.${SECRET_DOMAIN}"
       AUTH_WEB_HOST: "auth.openhands.${SECRET_DOMAIN}"  # Override chart default "keycloak"
-
+ 
       # Runtime configuration - use remote runtime-api
       # RUNTIME: Chart hardcodes this to "remote" - no need to duplicate
       SANDBOX_REMOTE_RUNTIME_API_TIMEOUT: "180"

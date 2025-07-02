@@ -28,14 +28,14 @@ spec:
   values:
     # Enable in-cluster Kubernetes authentication (perfect for Talos)
     runtimeInSameCluster: true
-    
+
     # Reduce replicas for resource-constrained cluster
     replicaCount: 1
-    
+
     # Disable autoscaling to prevent resource issues
     autoscaling:
       enabled: false
-    
+
     env:
       # Database configuration for separate runtime_api_db
       DATABASE_HOST: "openhands-postgresql"
@@ -47,50 +47,50 @@ spec:
           secretKeyRef:
             name: postgres-password
             key: password
-      
+
       # Kubernetes runtime configuration for Talos
       RUNTIME_IN_SAME_CLUSTER: "true"
       K8S_NAMESPACE: "openhands"
-      
+
       # Infrastructure configuration for Talos
       INGRESS_CLASS: "cilium"
       STORAGE_CLASS: "longhorn"
       RUNTIME_BASE_URL: "runtime-api.openhands.sevendays.cloud"
       RUNTIME_DOMAIN: "sevendays.cloud"
-      
+
       # Resource configuration
       MEMORY_REQUEST: "2048Mi"
       CPU_REQUEST: "1000m"
       PERSISTENT_STORAGE_SIZE: "10Gi"
-      
+
       # Security and performance
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONUNBUFFERED: "1"
       DEV_MODE: "false"
-      
+
       # Do NOT set cloud provider variables for Talos
       # GCP_PROJECT: ""    # Leave unset for non-GKE clusters
       # AWS_REGION: ""     # Leave unset for non-EKS clusters
-    
+
     # Database configuration (using shared PostgreSQL instance)
     postgresql:
       enabled: false  # Use shared PostgreSQL
       auth:
         existingSecret: "postgres-password"
         passwordKey: "password"
-    
+
     # External database configuration
     database:
       secretName: "runtime-api-db-credentials"
-    
+
     # Image configuration
     image:
       tag: "sha-77dd418"
       pullPolicy: Always
-    
+
     imagePullSecrets:
       - name: ghcr-login-secret
-    
+
     # Ingress configuration for runtime-api
     ingress:
       enabled: true
@@ -98,11 +98,11 @@ spec:
       className: "cilium"
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
-    
+
     # Migration job configuration
     migrationJob:
       enabled: true
-    
+
     # Warm runtimes configuration with VS Code support
     warmRuntimes:
       enabled: true
@@ -136,27 +136,33 @@ spec:
           environment:
             LITELLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
             LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-    
+      extraEnv:
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-password
+              key: password
+
     # Health checks
     startupProbe:
       enabled: true
       initialDelaySeconds: 60
       periodSeconds: 15
       failureThreshold: 20
-    
+
     # Resource configuration - reduced for resource-constrained cluster
     resources:
       requests:
         cpu: "250m"       # Reduced from 1000m
         memory: "1Gi"     # Reduced from 4Gi
       limits:
-        cpu: "500m"       # Reduced from 1000m  
+        cpu: "500m"       # Reduced from 1000m
         memory: "2Gi"     # Reduced from 4Gi
-    
+
     # Monitoring
     monitoring:
       enabled: false
-    
+
     # Cleanup configuration
     cleanup:
       enabled: true
