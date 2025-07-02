@@ -1,0 +1,10 @@
+machine:
+  files:
+    - content: |-
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.gvisor]
+          runtime_type = "io.containerd.runsc.v1"
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.gvisor.options]
+          TypeUrl = "io.containerd.runsc.v1.options"
+      permissions: 0o644
+      path: /etc/cri/conf.d/gvisor.part
+      op: create

@@ -1,3 +1,6 @@
 machine:
   systemExtensions:
     - image: ghcr.io/siderolabs/iscsi-tools:v#{ talosVersion }#
+    - image: ghcr.io/siderolabs/util-linux-tools:#{ talosVersion }#
+    - image: ghcr.io/siderolabs/gvisor:#{ talosVersion }#
+
