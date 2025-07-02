@@ -121,7 +121,7 @@ spec:
       sectionName: http
   rules:
     - backendRefs:
-        - name: runtime-api
+        - name: openhands-runtime-api
           namespace: openhands
           port: 5000
       matches:
