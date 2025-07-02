@@ -37,17 +37,6 @@ spec:
       enabled: false
 
     env:
-      # Database configuration for separate runtime_api_db
-      DATABASE_HOST: "openhands-postgresql"
-      DATABASE_PORT: "5432"
-      DATABASE_NAME: "runtime_api_db"  # Separate database for runtime-api
-      DATABASE_USERNAME: "postgres"
-      DATABASE_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: postgres-password
-            key: password
-
       # Kubernetes runtime configuration for Talos
       RUNTIME_IN_SAME_CLUSTER: "true"
       K8S_NAMESPACE: "openhands"
@@ -63,15 +52,11 @@ spec:
       CPU_REQUEST: "1000m"
       PERSISTENT_STORAGE_SIZE: "10Gi"
 
-      # Legacy variables required by warm-runtimes & cleanup jobs
-      DB_HOST: "openhands-postgresql"
-      DB_NAME: "runtime_api_db"
-      DB_USER: "postgres"
-      DB_PASS:
-        valueFrom:
-          secretKeyRef:
-            name: postgres-password
-            key: password
+      # Database credentials are now provided exclusively via
+      # `.values.database.secretName` (runtime-api-db-credentials),
+      # which the chart maps to the appropriate DB_* and DATABASE_*
+      # environment variables for all workloads.  Explicit overrides
+      # here were causing malformed env vars and have been removed.
 
       # Security and performance
       PYTHONDONTWRITEBYTECODE: "1"
@@ -146,26 +131,10 @@ spec:
           environment:
             LITELLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
             LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-            DB_HOST: "openhands-postgresql"
-            DB_NAME: "runtime_api_db"
-            DB_USER: "postgres"
-            DB_PASS:
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-password
-                  key: password
+            # Database environment variables are automatically
+            # injected from the `runtime-api-db-credentials` secret.
           extraEnv:
-            - name: DB_HOST
-              value: "openhands-postgresql"
-            - name: DB_NAME
-              value: "runtime_api_db"
-            - name: DB_USER
-              value: "postgres"
-            - name: DB_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-password
-                  key: password
+            # No manual DB_* overrides are required; remove duplicates
 
     # Health checks
     startupProbe:
