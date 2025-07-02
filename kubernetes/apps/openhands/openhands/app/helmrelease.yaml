@@ -64,7 +64,7 @@ spec:
         # Resource configuration
         MEMORY_REQUEST: "2048Mi"
         CPU_REQUEST: "1000m"
-        RUNTIME_CLASS: ""  # Use default runtime class
+        RUNTIME_CLASS: "gvisor"  # Use gvisor runtime class for containerd
 
                 # Session and cleanup configuration
         SESSION_TIMEOUT: "3600"  # 1 hour session timeout
