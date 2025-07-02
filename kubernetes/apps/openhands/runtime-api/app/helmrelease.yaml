@@ -51,6 +51,7 @@ spec:
       MEMORY_REQUEST: "2048Mi"
       CPU_REQUEST: "1000m"
       PERSISTENT_STORAGE_SIZE: "10Gi"
+      RUNTIME_CLASS: "gvisor"  # Use gVisor runtime class for enhanced security
 
       # Database credentials are now provided exclusively via
       # `.values.database.secretName` (runtime-api-db-credentials),
