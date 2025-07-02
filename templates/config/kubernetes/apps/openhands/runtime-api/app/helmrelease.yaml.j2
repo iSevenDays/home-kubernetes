@@ -146,24 +146,26 @@ spec:
           environment:
             LITELLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
             LLM_BASE_URL: "http://openhands-litellm.openhands.svc.cluster.local:4000"
-      extraEnv:
-        - name: DB_HOST
-          value: "openhands-postgresql"
-        - name: DB_NAME
-          value: "runtime_api_db"
-        - name: DB_USER
-          value: "postgres"
-        - name: DB_PASS
-          valueFrom:
-            secretKeyRef:
-              name: postgres-password
-              key: password
-        # Legacy variables retained for backward-compatibility
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-password
-              key: password
+            DB_HOST: "openhands-postgresql"
+            DB_NAME: "runtime_api_db"
+            DB_USER: "postgres"
+            DB_PASS:
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-password
+                  key: password
+          extraEnv:
+            - name: DB_HOST
+              value: "openhands-postgresql"
+            - name: DB_NAME
+              value: "runtime_api_db"
+            - name: DB_USER
+              value: "postgres"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-password
+                  key: password
 
     # Health checks
     startupProbe:
