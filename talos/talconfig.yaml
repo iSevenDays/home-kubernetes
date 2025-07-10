@@ -24,7 +24,7 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/cc493cae44e0bdbbefb5b5d1fb22ff724134cd7c6bb65172fa84e181568be45d
+    talosImageURL: factory.talos.dev/installer/6b198ae9d625ff3b1888974e3903cd4fcfa8317306a685611670168ef3b157fc
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -43,7 +43,7 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/cc493cae44e0bdbbefb5b5d1fb22ff724134cd7c6bb65172fa84e181568be45d
+    talosImageURL: factory.talos.dev/installer/6b198ae9d625ff3b1888974e3903cd4fcfa8317306a685611670168ef3b157fc
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -62,7 +62,7 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/cc493cae44e0bdbbefb5b5d1fb22ff724134cd7c6bb65172fa84e181568be45d
+    talosImageURL: factory.talos.dev/installer/6b198ae9d625ff3b1888974e3903cd4fcfa8317306a685611670168ef3b157fc
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -79,7 +79,6 @@ nodes:
 
 # Global patches
 patches:
-  - "@./patches/global/machine-files.yaml"
   - "@./patches/global/machine-kubelet.yaml"
   - "@./patches/global/machine-longhorn.yaml"
   - "@./patches/global/machine-mount-propagation.yaml"
