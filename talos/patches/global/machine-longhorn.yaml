@@ -1,3 +1,6 @@
 machine:
   systemExtensions:
     - image: ghcr.io/siderolabs/iscsi-tools:v
+    - image: ghcr.io/siderolabs/util-linux-tools:
+    - image: ghcr.io/siderolabs/gvisor:
+
