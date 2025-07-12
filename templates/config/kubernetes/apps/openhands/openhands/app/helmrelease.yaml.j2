@@ -35,7 +35,7 @@ spec:
     runtime:
       image:
         repository: ghcr.io/all-hands-ai/runtime
-        tag: "3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
+        tag: "9991323-nikolaik"
 
     # Enable runtime-api for native Kubernetes runtime support
     runtime-api:
@@ -94,7 +94,7 @@ spec:
         count: 1
         configs:
           - name: default
-            image: "ghcr.io/all-hands-ai/runtime:3c39b93f7e151f88e7b4274b80aafa604fcae092-nikolaik"
+            image: "ghcr.io/all-hands-ai/runtime:9991323-nikolaik"
             working_dir: "/openhands/code/"
             environment:
               # Pass LLM configuration to runtime containers
