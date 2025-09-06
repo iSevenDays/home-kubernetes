@@ -65,11 +65,6 @@ spec:
               limits:
                 cpu: 500m
                 memory: 512Mi
-            volumeMounts:
-              - name: config
-                mountPath: /opt/adguardhome/conf
-              - name: data
-                mountPath: /opt/adguardhome/work
     
     defaultPodOptions:
       hostNetwork: true  # Required for DHCP functionality
