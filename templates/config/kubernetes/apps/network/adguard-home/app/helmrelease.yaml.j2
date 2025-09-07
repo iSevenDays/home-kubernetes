@@ -40,6 +40,26 @@ spec:
                 cp -f /tmp/config/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml
                 # Patch the interface_name in the copied config (PVC is writable)
                 sed -i "s/^\(\s*interface_name:\s*\).*/\1$IFACE/" /opt/adguardhome/conf/AdGuardHome.yaml || true
+                # If a Secret with user rules is provided, merge it into the config
+                if [ -s /tmp/user-rules/user_rules.txt ]; then
+                  TMPFILE="/opt/adguardhome/conf/AdGuardHome.yaml.tmp"
+                  awk '
+                    {
+                      # capture indentation of current line
+                      match($0, /^[[:space:]]*/); ind = substr($0, 1, RLENGTH)
+                      if ($0 ~ /^[[:space:]]*user_rules:/) {
+                        print ind "user_rules:";
+                        while ((getline l < "/tmp/user-rules/user_rules.txt") > 0) {
+                          if (l ~ /^[[:space:]]*$/) continue;
+                          print ind "  - " l;
+                        }
+                        close("/tmp/user-rules/user_rules.txt");
+                        next;
+                      }
+                      print $0;
+                    }
+                  ' /opt/adguardhome/conf/AdGuardHome.yaml > "$TMPFILE" && mv "$TMPFILE" /opt/adguardhome/conf/AdGuardHome.yaml
+                fi
                 chown 0:0 /opt/adguardhome/conf/AdGuardHome.yaml
                 chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml
         containers:
@@ -129,6 +149,13 @@ spec:
           adguard-home:
             init-config:
               - path: /tmp/config
+      user-rules:
+        type: secret
+        name: adguard-home-user-rules
+        advancedMounts:
+          adguard-home:
+            init-config:
+              - path: /tmp/user-rules
     route:
       app:
         hostnames: ["adguard.#{ cloudflare_domain }#"]
