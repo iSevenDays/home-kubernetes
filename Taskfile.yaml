@@ -90,6 +90,28 @@ tasks:
           done
         fi
         
+        # Clean up orphaned deployments in namespaces with no active HelmReleases
+        NAMESPACES_WITH_DEPLOYMENTS=$(kubectl get deployment -A -o json | jq -r '.items[].metadata.namespace' | sort -u)
+        if [ -n "$NAMESPACES_WITH_DEPLOYMENTS" ]; then
+          echo "🔍 Checking for orphaned deployments in namespaces without HelmReleases..."
+          echo "$NAMESPACES_WITH_DEPLOYMENTS" | while read -r namespace; do
+            # Skip system namespaces
+            if [[ "$namespace" =~ ^(kube-system|kube-public|kube-node-lease|flux-system|longhorn-system|cilium)$ ]]; then
+              continue
+            fi
+            
+            # Check if there are any HelmReleases in this namespace
+            HELM_RELEASES_COUNT=$(kubectl get helmrelease -n "$namespace" 2>/dev/null | wc -l || echo "0")
+            if [ "$HELM_RELEASES_COUNT" -le 1 ]; then  # Only header line means no releases
+              echo "🧹 Cleaning up all deployments in namespace $namespace (no active HelmReleases)..."
+              kubectl delete deployment --all -n "$namespace" --grace-period=0 || true
+              kubectl delete service --all -n "$namespace" 2>/dev/null || true
+              kubectl delete pvc --all -n "$namespace" 2>/dev/null || true
+              kubectl delete job --all -n "$namespace" 2>/dev/null || true
+            fi
+          done
+        fi
+        
         # Clean up deployments with 0 replicas that are more than 10 minutes old
         ZERO_DEPLOYMENTS=$(kubectl get deployment -A -o json | jq -r '.items[] | select(.spec.replicas == 0 and (now - (.metadata.creationTimestamp | fromdateiso8601)) > 600) | "\(.metadata.namespace)/\(.metadata.name)"')
         if [ -n "$ZERO_DEPLOYMENTS" ]; then
