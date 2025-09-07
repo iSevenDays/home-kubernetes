@@ -90,6 +90,7 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: "192.168.0.185"
+          lbipam.cilium.io/assign-to-node: talos-control1
         externalTrafficPolicy: Local
         ports:
           web:
