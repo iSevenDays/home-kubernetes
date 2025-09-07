@@ -99,11 +99,11 @@ spec:
           dns-tcp:
             port: 53
             protocol: TCP
-            targetPort: 53
+            targetPort: 5053
           dns-udp:
             port: 53
             protocol: UDP
-            targetPort: 53
+            targetPort: 5053
     persistence:
       config:
         existingClaim: adguard-home-config
