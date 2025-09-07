@@ -9,3 +9,9 @@ commonLabels:
 resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
+configMapGenerator:
+  - name: adguard-home-config
+    files:
+      - AdGuardHome.yaml=./resources/AdGuardHome.yaml
+generatorOptions:
+  disableNameSuffixHash: true
