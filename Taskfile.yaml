@@ -28,8 +28,87 @@ tasks:
   default: task --list
 
   reconcile:
-    desc: Force Flux to pull in changes from your Git repository
-    cmd: flux --namespace flux-system reconcile kustomization flux-system --with-source
+    desc: Force Flux to reconcile and cleanup failed/stalled resources
+    cmds:
+      - task: reconcile:cleanup-failed
+      - task: reconcile:flux-sync
+      - task: reconcile:cleanup-orphaned
     preconditions:
       - test -f {{.KUBECONFIG}}
       - which flux
+      - which kubectl
+      - which helm
+
+  reconcile:flux-sync:
+    desc: Force Flux to pull in changes from Git repository
+    cmd: flux --namespace flux-system reconcile kustomization flux-system --with-source
+    silent: false
+
+  reconcile:cleanup-failed:
+    desc: Cleanup failed and stalled HelmReleases
+    cmds:
+      - |
+        echo "🔍 Checking for failed/stalled HelmReleases..."
+        FAILED_RELEASES=$(kubectl get helmrelease -A -o json | jq -r '.items[] | select(.status.conditions[]? | .type == "Stalled" and .status == "True") | "\(.metadata.namespace)/\(.metadata.name)"')
+        if [ -n "$FAILED_RELEASES" ]; then
+          echo "⚠️  Found failed/stalled HelmReleases:"
+          echo "$FAILED_RELEASES"
+          echo "$FAILED_RELEASES" | while IFS='/' read -r namespace name; do
+            echo "🧹 Cleaning up $namespace/$name..."
+            # Remove finalizers to allow deletion
+            kubectl patch helmrelease "$name" -n "$namespace" --type='merge' -p='{"metadata":{"finalizers":[]}}' || true
+            # Force delete the HelmRelease
+            kubectl delete helmrelease "$name" -n "$namespace" --grace-period=0 --force || true
+            # Uninstall the Helm release if it exists
+            helm uninstall "$name" -n "$namespace" || true
+          done
+        else
+          echo "✅ No failed/stalled HelmReleases found"
+        fi
+    silent: false
+
+  reconcile:cleanup-orphaned:
+    desc: Cleanup orphaned pods and resources
+    cmds:
+      - |
+        echo "🔍 Checking for orphaned resources..."
+        
+        # Clean up pods in problematic states (Error, CreateContainerConfigError, Unknown, stuck Terminating, or long-running ContainerCreating)
+        ORPHANED_PODS=$(kubectl get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded -o json | jq -r '.items[] | select(
+          .status.phase == "Failed" or 
+          .status.phase == "Unknown" or
+          (.status.containerStatuses[]?.state.waiting?.reason // "" | test("CreateContainerConfigError|ContainerStatusUnknown|ImagePullBackOff|ErrImagePull")) or
+          (.metadata.deletionTimestamp != null and (now - (.metadata.deletionTimestamp | fromdateiso8601)) > 300) or
+          (.status.phase == "Pending" and .status.containerStatuses[0]?.state.waiting?.reason == "ContainerCreating" and (now - (.metadata.creationTimestamp | fromdateiso8601)) > 3600)
+        ) | "\(.metadata.namespace)/\(.metadata.name)"')
+        
+        if [ -n "$ORPHANED_PODS" ]; then
+          echo "🧹 Cleaning up orphaned/stuck pods..."
+          echo "$ORPHANED_PODS" | while IFS='/' read -r namespace name; do
+            echo "  Force deleting pod $namespace/$name"
+            kubectl delete pod "$name" -n "$namespace" --grace-period=0 --force || true
+          done
+        fi
+        
+        # Clean up deployments with 0 replicas that are more than 10 minutes old
+        ZERO_DEPLOYMENTS=$(kubectl get deployment -A -o json | jq -r '.items[] | select(.spec.replicas == 0 and (now - (.metadata.creationTimestamp | fromdateiso8601)) > 600) | "\(.metadata.namespace)/\(.metadata.name)"')
+        if [ -n "$ZERO_DEPLOYMENTS" ]; then
+          echo "🧹 Cleaning up zero-replica deployments..."
+          echo "$ZERO_DEPLOYMENTS" | while IFS='/' read -r namespace name; do
+            echo "  Deleting deployment $namespace/$name"
+            kubectl delete deployment "$name" -n "$namespace" --grace-period=0 || true
+          done
+        fi
+        
+        # Clean up old ReplicaSets with 0 desired replicas (>24h old)
+        OLD_RS=$(kubectl get replicaset -A -o json | jq -r '.items[] | select(.spec.replicas == 0 and (.metadata.creationTimestamp | fromdateiso8601) < (now - 86400)) | "\(.metadata.namespace)/\(.metadata.name)"')
+        if [ -n "$OLD_RS" ]; then
+          echo "🧹 Cleaning up old ReplicaSets (>24h old with 0 replicas)..."
+          echo "$OLD_RS" | while IFS='/' read -r namespace name; do
+            echo "  Deleting ReplicaSet $namespace/$name"
+            kubectl delete replicaset "$name" -n "$namespace" --grace-period=0 || true
+          done
+        fi
+        
+        echo "✅ Cleanup completed"
+    silent: false
