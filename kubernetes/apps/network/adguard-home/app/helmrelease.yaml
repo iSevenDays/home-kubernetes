@@ -52,7 +52,8 @@ spec:
                         print ind "user_rules:";
                         while ((getline l < rules) > 0) {
                           if (l ~ /^[[:space:]]*$/) continue;
-                          print ind "  - " l;
+                          # Quote each rule for safe YAML (handles special chars like @ | $ ^)
+                          print ind "  - \"" l "\"";
                         }
                         close(rules);
                         inblock=1;
