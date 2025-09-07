@@ -3,6 +3,19 @@
 #
 # Usage:
 #   ./scripts/gitops-sync.sh "feat(openhands): update LiteLLM secret"
+#   ./scripts/gitops-sync.sh -h|--help   # Show help and options
+#
+# Optional environment variables:
+#   GITOPS_ROLLOUT="<namespace>/<deployment>"
+#     - After reconciling Flux, perform `kubectl rollout restart deploy` to force init containers to re-run
+#     - Example: GITOPS_ROLLOUT="network/adguard-home" ./scripts/gitops-sync.sh "chore: sync"
+#
+#   GITOPS_WATCH_NS="<namespace>"
+#   GITOPS_WATCH_LABEL="<label-selector>"
+#   GITOPS_WATCH_SECONDS="<seconds>"  # optional; if omitted, prints a one-time status
+#     - After reconcile, show or briefly watch pods that match a label in a namespace
+#     - Example (30s watch): GITOPS_WATCH_NS=network GITOPS_WATCH_LABEL='app.kubernetes.io/name=adguard-home' \
+#       GITOPS_WATCH_SECONDS=30 ./scripts/gitops-sync.sh "feat: deploy adguard"
 #
 # The script executes:
 #   1) task configure   – renders & validates manifests/secrets
@@ -15,14 +28,49 @@
 # -----------------------------------------------------------------------------
 set -euo pipefail
 
+# Print usage/help and exit
+show_help() {
+  cat <<'EOF'
+Usage:
+  ./scripts/gitops-sync.sh "<commit message>"
+  ./scripts/gitops-sync.sh -h|--help
+
+Steps performed:
+  1) task configure --yes
+  2) git add templates kubernetes
+  3) git commit -m "<message>" (when changes exist)
+  4) git push (when changes exist)
+  5) task reconcile
+  6) Post-checks: flux get ks -A; flux get hr -A
+
+Optional environment variables:
+  GITOPS_ROLLOUT="<namespace>/<deployment>"
+    - After reconcile, restart a deployment to force init containers to re-run
+    - Example: GITOPS_ROLLOUT="network/adguard-home" ./scripts/gitops-sync.sh "chore: sync"
+
+  GITOPS_WATCH_NS="<namespace>"
+  GITOPS_WATCH_LABEL="<label-selector>"
+  GITOPS_WATCH_SECONDS="<seconds>"  # optional
+    - Show or briefly watch pods matching the label in the namespace after reconcile
+    - Example: GITOPS_WATCH_NS=network GITOPS_WATCH_LABEL='app.kubernetes.io/name=adguard-home' \
+        GITOPS_WATCH_SECONDS=30 ./scripts/gitops-sync.sh "feat: deploy adguard"
+EOF
+}
+
 # Ensure we always operate from the repository root (script may be called from anywhere).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$REPO_ROOT"
 
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
 if [[ $# -lt 1 ]]; then
     echo "Error: commit message required." >&2
     echo "Usage: $0 \"<commit message>\"" >&2
+    echo "Tip: run with -h for options (GITOPS_ROLLOUT, GITOPS_WATCH_*)" >&2
     exit 1
 fi
 COMMIT_MSG="$*"
