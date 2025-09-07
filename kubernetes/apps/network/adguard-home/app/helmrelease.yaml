@@ -126,6 +126,7 @@ spec:
               - path: /tmp/config
     configMaps:
       config:
+        enabled: true
         data:
           AdGuardHome.yaml: |
             http:
