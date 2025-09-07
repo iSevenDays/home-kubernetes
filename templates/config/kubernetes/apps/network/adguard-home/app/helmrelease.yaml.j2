@@ -6,14 +6,9 @@ metadata:
   name: &app adguard-home
 spec:
   interval: 1h
-  chart:
-      spec:
-        chart: adguard-home
-        version: 1.36.1
-        sourceRef:
-          kind: HelmRepository
-          name: adguard-home
-          namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: app-template
   install:
     remediation:
       retries: -1
@@ -115,7 +110,7 @@ spec:
         globalMounts:
           - path: /opt/adguardhome/conf
         advancedMounts:
-          init-config:
+          adguard-home:
             init-config:
               - path: /opt/adguardhome/conf
       data:
@@ -130,7 +125,7 @@ spec:
         type: configMap
         name: adguard-home-config
         advancedMounts:
-          init-config:
+          adguard-home:
             init-config:
               - path: /tmp/config
     configMaps:
