@@ -94,7 +94,7 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: "#{ adguard_dns_addr }#"
-        externalTrafficPolicy: Local
+        externalTrafficPolicy: Cluster
         ports:
           web:
             port: *port
