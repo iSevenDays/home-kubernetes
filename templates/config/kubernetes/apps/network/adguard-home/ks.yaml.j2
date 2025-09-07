@@ -12,6 +12,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: k8s-gateway
+      namespace: network
   path: ./kubernetes/apps/network/adguard-home/app
   prune: true
   sourceRef:
