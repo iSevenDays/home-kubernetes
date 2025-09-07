@@ -63,10 +63,9 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: talos-control1
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
-        fsGroup: 65534
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
         fsGroupChangePolicy: OnRootMismatch
     service:
       app:
