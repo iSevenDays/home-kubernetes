@@ -30,10 +30,16 @@ spec:
               - sh
               - -c
               - |
+                # Detect host default route interface (for DHCP when using hostNetwork)
+                IFACE="$(ip -4 route show default | awk '/default/ {print $5; exit}')"
+                [ -z "$IFACE" ] && IFACE="eth0"
+                # Backup existing config then overwrite from ConfigMap
                 if [ -f /opt/adguardhome/conf/AdGuardHome.yaml ]; then
                   cp /opt/adguardhome/conf/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml.bak || true
                 fi
                 cp -f /tmp/config/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml
+                # Patch the interface_name in the copied config (PVC is writable)
+                sed -i "s/^\(\s*interface_name:\s*\).*/\1$IFACE/" /opt/adguardhome/conf/AdGuardHome.yaml || true
                 chown 0:0 /opt/adguardhome/conf/AdGuardHome.yaml
                 chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml
         containers:
@@ -77,8 +83,6 @@ spec:
     defaultPodOptions:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
-      nodeSelector:
-        kubernetes.io/hostname: talos-control1
       securityContext:
         runAsUser: 0
         runAsGroup: 0
@@ -90,7 +94,6 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: "#{ adguard_dns_addr }#"
-          lbipam.cilium.io/assign-to-node: talos-control1
         externalTrafficPolicy: Local
         ports:
           web:
