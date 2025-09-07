@@ -98,7 +98,27 @@ statistics:
   ignored: []
   interval: 720h
   enabled: true
-filters: []
+filters:
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
+    name: AdGuard DNS filter
+    id: 1
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
+    name: AdAway Default Blocklist
+    id: 2
+  - enabled: true
+    url: https://easylist-downloads.adblockplus.org/adblock_premium.txt
+    name: EasyList Adblock Premium
+    id: 1751806993
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
+    name: OISD Blocklist Big
+    id: 1751806994
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_30.txt
+    name: Phishing URL Blocklist (PhishTank and OpenPhish)
+    id: 1751806995
 whitelist_filters: []
 user_rules: []
 dhcp:
@@ -124,7 +144,9 @@ filtering:
   blocked_services:
     schedule:
       time_zone: UTC
-    ids: []
+    ids:
+      - mail_ru
+      - snapchat
   protection_disabled_until: null
   safe_search:
     enabled: false
