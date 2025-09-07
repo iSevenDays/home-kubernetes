@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: adguard-home-data
   namespace: network
+  annotations:
+    description: "PVC for AdGuard Home configuration and data"
 spec:
   accessModes:
     - ReadWriteOnce
