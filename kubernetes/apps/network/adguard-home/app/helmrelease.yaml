@@ -21,6 +21,20 @@ spec:
       adguard-home:
         replicas: 1
         strategy: Recreate
+        initContainers:
+          init-config:
+            image:
+              repository: busybox
+              tag: 1.36.1
+            command:
+              - sh
+              - -c
+              - |
+                if [ ! -f /opt/adguardhome/conf/AdGuardHome.yaml ]; then
+                  cp /tmp/config/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml
+                  chown 0:0 /opt/adguardhome/conf/AdGuardHome.yaml
+                  chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml
+                fi
         containers:
           app:
             image:
@@ -42,14 +56,16 @@ spec:
                   failureThreshold: 3
               readiness: *probes
             securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: false
               capabilities:
                 add:
                   - NET_ADMIN
                   - NET_RAW 
                   - NET_BIND_SERVICE
-                drop: ["ALL"]
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - FOWNER
             resources:
               requests:
                 cpu: 100m
@@ -93,6 +109,10 @@ spec:
         existingClaim: adguard-home-config
         globalMounts:
           - path: /opt/adguardhome/conf
+        advancedMounts:
+          init-config:
+            init-config:
+              - path: /opt/adguardhome/conf
       data:
         existingClaim: adguard-home-data
         globalMounts:
@@ -101,6 +121,13 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      config-template:
+        type: configMap
+        name: adguard-home-config
+        advancedMounts:
+          init-config:
+            init-config:
+              - path: /tmp/config
     configMaps:
       config:
         data:
