@@ -43,18 +43,27 @@ spec:
                 # If a Secret with user rules is provided, merge it into the config
                 if [ -s /tmp/user-rules/user_rules.txt ]; then
                   TMPFILE="/opt/adguardhome/conf/AdGuardHome.yaml.tmp"
-                  awk '
+                  awk -v rules="/tmp/user-rules/user_rules.txt" '
+                    BEGIN{inblock=0}
                     {
-                      # capture indentation of current line
+                      # current line indentation
                       match($0, /^[[:space:]]*/); ind = substr($0, 1, RLENGTH)
                       if ($0 ~ /^[[:space:]]*user_rules:/) {
                         print ind "user_rules:";
-                        while ((getline l < "/tmp/user-rules/user_rules.txt") > 0) {
+                        while ((getline l < rules) > 0) {
                           if (l ~ /^[[:space:]]*$/) continue;
                           print ind "  - " l;
                         }
-                        close("/tmp/user-rules/user_rules.txt");
+                        close(rules);
+                        inblock=1;
                         next;
+                      }
+                      if (inblock==1) {
+                        # Skip original user_rules list items and any further-indented lines
+                        if ($0 ~ ("^" ind "  -")) next;
+                        if ($0 ~ ("^" ind "  ")) next;
+                        inblock=0;
+                        # fall-through to print the first non-indented line after the block
                       }
                       print $0;
                     }
