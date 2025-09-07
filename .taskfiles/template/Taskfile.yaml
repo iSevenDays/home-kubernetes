@@ -54,11 +54,22 @@ tasks:
     desc: Render and validate configuration files
     prompt: Any conflicting files in the kubernetes directory will be overwritten... continue?
     cmds:
+      - 'echo "=== Step 1/5: Validating schemas ==="'
       - task: validate-schemas
+      - 'echo "✓ Schema validation completed successfully"'
+      - 'echo "=== Step 2/5: Rendering configuration templates ==="'
       - task: render-configs
+      - 'echo "✓ Configuration rendering completed successfully"'
+      - 'echo "=== Step 3/5: Encrypting secrets ==="'
       - task: encrypt-secrets
+      - 'echo "✓ Secret encryption completed successfully"'
+      - 'echo "=== Step 4/5: Validating Kubernetes configuration ==="'
       - task: validate-kubernetes-config
+      - 'echo "✓ Kubernetes validation completed successfully"'
+      - 'echo "=== Step 5/5: Validating Talos configuration ==="'
       - task: validate-talos-config
+      - 'echo "✓ Talos validation completed successfully"'
+      - 'echo "🎉 All configuration steps completed successfully!"'
     preconditions:
       - msg: An existing Age key interferes with the age key in this repository, rename or delete ~/.config/sops/age/keys.txt
         sh: '! test -f ~/.config/sops/age/keys.txt'
@@ -72,8 +83,11 @@ tasks:
   validate-schemas:
     internal: true
     cmds:
+      - 'echo "Validating cluster.yaml schema..."'
       - cue vet {{.TEMPLATE_CONFIG_FILE}} {{.TEMPLATE_RESOURCES_DIR}}/cluster.schema.cue
+      - 'echo "Validating nodes.yaml schema..."'
       - cue vet {{.TEMPLATE_NODE_CONFIG_FILE}} {{.TEMPLATE_RESOURCES_DIR}}/nodes.schema.cue
+      - 'echo "Schema validation completed"'
     preconditions:
       - test -f {{.TEMPLATE_RESOURCES_DIR}}/cluster.schema.cue
       - test -f {{.TEMPLATE_RESOURCES_DIR}}/nodes.schema.cue
@@ -81,7 +95,10 @@ tasks:
 
   render-configs:
     internal: true
-    cmd: makejinja
+    cmds:
+      - 'echo "Rendering configuration files with makejinja..."'
+      - makejinja
+      - 'echo "Configuration rendering completed"'
     env:
       PYTHONDONTWRITEBYTECODE: '1'
     preconditions:
@@ -92,14 +109,22 @@ tasks:
   encrypt-secrets:
     internal: true
     cmds:
+      - 'echo "Found {{.SECRET_FILE_COUNT}} secret files to process"'
       - for: { var: SECRET_FILES }
         cmd: |
+          echo "Processing secret file: {{.ITEM}}"
           if sops filestatus "{{.ITEM}}" | jq --exit-status ".encrypted == false" &>/dev/null; then
+              echo "  → Encrypting {{.ITEM}}"
               sops --encrypt --in-place "{{.ITEM}}"
+          else
+              echo "  → Already encrypted: {{.ITEM}}"
           fi
+      - 'echo "Secret encryption processing completed"'
     vars:
       SECRET_FILES:
         sh: find "{{.BOOTSTRAP_DIR}}" "{{.KUBERNETES_DIR}}" "{{.TALOS_DIR}}" -type f -name "*.sops.*" -print
+      SECRET_FILE_COUNT:
+        sh: find "{{.BOOTSTRAP_DIR}}" "{{.KUBERNETES_DIR}}" "{{.TALOS_DIR}}" -type f -name "*.sops.*" -print | wc -l | tr -d ' '
     preconditions:
       - test -f {{.SOPS_AGE_KEY_FILE}}
       - test -f {{.ROOT_DIR}}/.sops.yaml
@@ -107,7 +132,10 @@ tasks:
 
   validate-kubernetes-config:
     internal: true
-    cmd: bash {{.TEMPLATE_RESOURCES_DIR}}/kubeconform.sh {{.KUBERNETES_DIR}}
+    cmds:
+      - 'echo "Running kubeconform validation on Kubernetes manifests..."'
+      - bash {{.TEMPLATE_RESOURCES_DIR}}/kubeconform.sh {{.KUBERNETES_DIR}}
+      - 'echo "Kubernetes configuration validation completed"'
     preconditions:
       - test -f {{.TEMPLATE_RESOURCES_DIR}}/kubeconform.sh
       - which kubeconform
@@ -115,7 +143,10 @@ tasks:
   validate-talos-config:
     internal: true
     dir: '{{.TALOS_DIR}}'
-    cmd: talhelper validate talconfig {{.TALOS_DIR}}/talconfig.yaml
+    cmds:
+      - 'echo "Validating Talos configuration with talhelper..."'
+      - talhelper validate talconfig {{.TALOS_DIR}}/talconfig.yaml
+      - 'echo "Talos configuration validation completed"'
     preconditions:
       - test -f {{.TALOS_DIR}}/talconfig.yaml
       - which talhelper
