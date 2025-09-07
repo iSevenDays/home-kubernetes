@@ -6,6 +6,10 @@ metadata:
   name: &app adguard-home
   namespace: &namespace network
 spec:
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
