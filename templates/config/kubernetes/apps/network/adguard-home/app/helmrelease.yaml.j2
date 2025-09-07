@@ -25,10 +25,16 @@ spec:
           app:
             image:
               repository: adguard/adguardhome
-              tag: latest
+              tag: v0.107.52
               pullPolicy: IfNotPresent
             env:
               TZ: "Europe/Berlin"  # Adjust to your timezone
+            args:
+              - --port=3000
+              - --host=0.0.0.0
+              - --config=/opt/adguardhome/conf/AdGuardHome.yaml
+              - --work-dir=/opt/adguardhome/work
+              - --no-check-update
             probes:
               liveness:
                 enabled: true
@@ -37,7 +43,7 @@ spec:
                   httpGet:
                     path: /
                     port: 3000
-                  initialDelaySeconds: 30
+                  initialDelaySeconds: 60
                   periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 3
@@ -48,35 +54,28 @@ spec:
                   httpGet:
                     path: /
                     port: 3000
-                  initialDelaySeconds: 5
+                  initialDelaySeconds: 30
                   periodSeconds: 5
                   timeoutSeconds: 5
             securityContext:
-              allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false
-              capabilities:
-                add:
-                  - NET_ADMIN
-                  - NET_RAW
-                  - NET_BIND_SERVICE
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
             resources:
               requests:
                 cpu: 100m
-                memory: 256Mi
+                memory: 128Mi
               limits:
-                cpu: 500m
-                memory: 512Mi
+                cpu: 300m
+                memory: 256Mi
 
     defaultPodOptions:
-      hostNetwork: true  # Required for DHCP functionality
-      dnsPolicy: ClusterFirstWithHostNet
       securityContext:
-        runAsNonRoot: false  # AdGuard needs root for DHCP
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
-      nodeSelector:
-        kubernetes.io/hostname: talos-control1  # Pin to specific node for DHCP
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
 
     service:
       app:
@@ -90,16 +89,12 @@ spec:
             targetPort: 3000
             protocol: TCP
           dns-tcp:
-            port: 53
+            port: 5353
             targetPort: 5353
             protocol: TCP
           dns-udp:
-            port: 53
+            port: 5353
             targetPort: 5353
-            protocol: UDP
-          dhcp:
-            port: 67
-            targetPort: 67
             protocol: UDP
 
     persistence:

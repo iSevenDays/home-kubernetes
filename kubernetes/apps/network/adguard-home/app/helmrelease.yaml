@@ -29,6 +29,12 @@ spec:
               pullPolicy: IfNotPresent
             env:
               TZ: "Europe/Berlin"  # Adjust to your timezone
+            args:
+              - --port=3000
+              - --host=0.0.0.0
+              - --config=/opt/adguardhome/conf/AdGuardHome.yaml
+              - --work-dir=/opt/adguardhome/work
+              - --no-check-update
             probes:
               liveness:
                 enabled: true
@@ -68,15 +74,11 @@ spec:
                 memory: 512Mi
 
     defaultPodOptions:
-      hostNetwork: true  # Required for DHCP functionality
-      dnsPolicy: ClusterFirstWithHostNet
       securityContext:
-        runAsNonRoot: false  # AdGuard needs root for DHCP
+        runAsNonRoot: false
         runAsUser: 0
         runAsGroup: 0
         fsGroup: 0
-      nodeSelector:
-        kubernetes.io/hostname: talos-control1  # Pin to specific node for DHCP
 
     service:
       app:
@@ -96,10 +98,6 @@ spec:
           dns-udp:
             port: 53
             targetPort: 5353
-            protocol: UDP
-          dhcp:
-            port: 67
-            targetPort: 67
             protocol: UDP
 
     persistence:
