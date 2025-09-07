@@ -132,7 +132,9 @@ dhcp:
     range_end: 192.168.0.253
     lease_duration: 600
     icmp_timeout_msec: 1000
-    options: []
+    options:
+      - code: 6
+        value: 192.168.0.185
   dhcpv6:
     range_start: 2001::1
     lease_duration: 600
