@@ -434,6 +434,91 @@ The base Renovate configuration in your repository can be viewed at [.renovaterc
 
 Below is a general guide on trying to debug an issue with an resource or application. For example, if a workload/resource is not showing up or a pod has started but in a `CrashLoopBackOff` or `Pending` state. These steps do not include a way to fix the problem as the problem could be one of many different things.
 
+### AdGuard Home Troubleshooting
+
+Common issues and quick fixes observed when deploying AdGuard Home via app-template:
+
+- Flux sourceRef mismatch
+  - Symptom: Kustomization not reconciling; e.g. `GitRepository ... not found`.
+  - Fix: Use `spec.sourceRef: { kind: GitRepository, name: flux-system, namespace: flux-system }`.
+  - Verify: `flux get ks -A`.
+
+- Helm source vs. app-template OCI
+  - Symptom: HelmRelease errors about missing `HelmRepository` or chart not found.
+  - Fix: Use `spec.chartRef: { kind: OCIRepository, name: app-template }` instead of `spec.chart` + `HelmRepository`.
+  - Verify: `flux get sources oci -n flux-system` shows `app-template` Ready.
+
+- Config injection (ConfigMap not found)
+  - Symptom: Pod events show `configmap "..." not found`, or app does not pick up config.
+  - Fix: Generate ConfigMap with Kustomize using `configMapGenerator` and set `generatorOptions.disableNameSuffixHash: true` for a stable name. Mount the CM to the init container (e.g. `/tmp/config`).
+
+- app-template advancedMounts shape
+  - Symptom: Helm error `No enabled controller found ... (persistence item: 'X', controller: 'init-config')`.
+  - Fix: `advancedMounts` must be keyed by controller name then container name, e.g. `advancedMounts: adguard-home: init-config:`.
+
+- Duplicate mount paths
+  - Symptom: `volumeMounts[*].mountPath ... must be unique`.
+  - Fix: Mount PVCs via `globalMounts` (applies to all containers). Only mount the ConfigMap to the init container.
+
+- Config schema mismatch
+  - Symptom: `parsing configuration file: unknown current schema version XX`.
+  - Fix: Pin the container image to a version supporting the schema (e.g. `adguard/adguardhome:v0.107.65`).
+
+- Port 53 conflict with hostNetwork
+  - Symptom: `listen udp 0.0.0.0:53: bind: address already in use`.
+  - Fix: Set `dns.port: 5053` in `AdGuardHome.yaml` and set Service `targetPort: 5053` while keeping Service ports at `53` for TCP/UDP. Keep `hostNetwork: true` for DHCP.
+
+- Init container copy strategy
+  - Symptom: Config changes not applied due to PVC retaining old file across restarts.
+  - Fix: Have the init container always copy the ConfigMap file into the PVC on boot (optionally back up existing as `.bak`). Alternatively, patch only specific keys (e.g. `dns.port`) in-place using `sed`/`yq`.
+
+Quick triage commands:
+
+```sh
+flux get ks -A; flux get hr -A
+kubectl -n network get pods,events
+kubectl -n network logs -l app.kubernetes.io/name=adguard-home -c init-config --tail=200
+kubectl -n network logs -l app.kubernetes.io/name=adguard-home -c app --tail=200
+kubectl -n network get cm adguard-home-config -o yaml
+kubectl -n network get pvc
+```
+
+### 🔧 kubectl Connectivity Issues
+
+### 🔧 kubectl Connectivity Issues
+
+If you encounter connection timeouts or certificate errors with kubectl:
+
+**Problem:** `kubectl get nodes` fails with timeouts or certificate errors
+```
+E0906 18:03:05.570195   95074 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"https://10.0.80.99:6443/api?timeout=32s\": dial tcp 10.0.80.99:6443: i/o timeout"
+```
+
+**Solution:**
+
+1. Check your current kubectl configuration:
+   ```sh
+   kubectl config current-context
+   kubectl config view --minify
+   ```
+
+2. If the server URL is incorrect (old cluster IP), update it to match your `cluster.yaml`:
+   ```sh
+   kubectl config set-cluster home-kubernetes --server=https://192.168.0.181:6443
+   ```
+   
+3. If you get certificate errors, use the local kubeconfig file:
+   ```sh
+   cp /path/to/your/project/kubeconfig ~/.kube/config
+   ```
+
+4. Test the connection:
+   ```sh
+   kubectl get nodes
+   ```
+
+**Note:** The `kubeconfig` file in your project root contains the correct certificates and server configuration generated during cluster bootstrap.
+
 1. Check if the Flux resources are up-to-date and in a ready state:
 
    📍 _Run `task reconcile` to force Flux to sync your Git repository state_

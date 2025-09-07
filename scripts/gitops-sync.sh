@@ -51,3 +51,34 @@ echo "[gitops-sync] Triggering Flux reconciliation..."
 task reconcile
 
 echo "[gitops-sync] Done."
+
+# Optional post-checks and helpers
+echo "[gitops-sync] Post-check: Flux Kustomizations and HelmReleases"
+flux get ks -A || true
+flux get hr -A || true
+
+# Optional rollout restart to force init containers to re-run (e.g., copy ConfigMap to PVC)
+# Set GITOPS_ROLLOUT="<namespace>/<deployment>" to enable
+if [[ -n "${GITOPS_ROLLOUT:-}" ]]; then
+  ns="${GITOPS_ROLLOUT%/*}"
+  dep="${GITOPS_ROLLOUT#*/}"
+  if [[ -n "$ns" && -n "$dep" && "$ns" != "$dep" ]]; then
+    echo "[gitops-sync] Performing rollout restart: namespace=$ns, deployment=$dep"
+    kubectl -n "$ns" rollout restart deploy "$dep" || true
+  else
+    echo "[gitops-sync] Warning: GITOPS_ROLLOUT must be in 'namespace/deployment' format"
+  fi
+fi
+
+# Optional short watch for a label selector in a namespace
+# Set GITOPS_WATCH_NS and GITOPS_WATCH_LABEL (and optionally GITOPS_WATCH_SECONDS)
+if [[ -n "${GITOPS_WATCH_NS:-}" && -n "${GITOPS_WATCH_LABEL:-}" ]]; then
+  secs="${GITOPS_WATCH_SECONDS:-0}"
+  echo "[gitops-sync] Watching pods in $GITOPS_WATCH_NS matching '$GITOPS_WATCH_LABEL' ${secs:+for $secs seconds}..."
+  if [[ "$secs" -gt 0 ]] 2>/dev/null; then
+    # Run watch for a bounded time
+    timeout "$secs" kubectl -n "$GITOPS_WATCH_NS" get pods -l "$GITOPS_WATCH_LABEL" -w || true
+  else
+    kubectl -n "$GITOPS_WATCH_NS" get pods -l "$GITOPS_WATCH_LABEL" || true
+  fi
+fi
