@@ -30,11 +30,12 @@ spec:
               - sh
               - -c
               - |
-                if [ ! -f /opt/adguardhome/conf/AdGuardHome.yaml ]; then
-                  cp /tmp/config/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml
-                  chown 0:0 /opt/adguardhome/conf/AdGuardHome.yaml
-                  chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml
+                if [ -f /opt/adguardhome/conf/AdGuardHome.yaml ]; then
+                  cp /opt/adguardhome/conf/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml.bak || true
                 fi
+                cp -f /tmp/config/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml
+                chown 0:0 /opt/adguardhome/conf/AdGuardHome.yaml
+                chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml
         containers:
           app:
             image:
