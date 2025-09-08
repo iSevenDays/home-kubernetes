@@ -1,6 +1,10 @@
 machine:
   network:
     disableSearchDomain: true
+    features:
+      # Disable the built-in DNS resolver to free up port 53
+      hostDNS:
+        enabled: false
     nameservers:
       - 1.1.1.1
       - 8.8.8.8
