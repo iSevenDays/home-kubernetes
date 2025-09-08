@@ -42,6 +42,8 @@ spec:
         app.kubernetes.io/name: adguard-dns53-labeller
     spec:
       hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: adguard-dns53-labeller
       tolerations:
         - operator: Exists
