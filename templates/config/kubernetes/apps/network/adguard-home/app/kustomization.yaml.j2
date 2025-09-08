@@ -10,6 +10,7 @@ resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
   - ./user-rules.secret.sops.yaml
+  - ./dns53-labeller.yaml
 configMapGenerator:
   - name: adguard-home-config
     files:

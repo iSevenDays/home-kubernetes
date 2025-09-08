@@ -113,6 +113,14 @@ spec:
     defaultPodOptions:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: adguard.sevendays.cloud/dns53-free
+                    operator: In
+                    values: ["true"]
       securityContext:
         runAsUser: 0
         runAsGroup: 0
@@ -134,11 +142,11 @@ spec:
           dns-tcp:
             port: 53
             protocol: TCP
-            targetPort: 5053
+            targetPort: 53
           dns-udp:
             port: 53
             protocol: UDP
-            targetPort: 5053
+            targetPort: 53
     persistence:
       config:
         existingClaim: adguard-home-config
