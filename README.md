@@ -480,8 +480,34 @@ kubectl -n network get pods,events
 kubectl -n network logs -l app.kubernetes.io/name=adguard-home -c init-config --tail=200
 kubectl -n network logs -l app.kubernetes.io/name=adguard-home -c app --tail=200
 kubectl -n network get cm adguard-home-config -o yaml
-kubectl -n network get pvc
+  kubectl -n network get pvc
 ```
+
+### AdGuard User Rules (SOPS)
+
+Sensitive AdGuard user rules are stored in a SOPS-encrypted Secret and merged into the AdGuard config by the init container at startup.
+
+- Location: `kubernetes/apps/network/adguard-home/app/user-rules.secret.sops.yaml`
+- Edit rules (encrypted in-place):
+
+```sh
+sops kubernetes/apps/network/adguard-home/app/user-rules.secret.sops.yaml
+# Update lines under:
+# stringData:
+#   user_rules.txt: |
+#     (one rule per line)
+```
+
+- Apply changes with GitOps and restart to merge rules:
+
+```sh
+./scripts/gitops-sync.sh "feat(adguard): update user rules"
+kubectl -n network rollout restart deploy adguard-home
+```
+
+- Notes:
+  - The base AdGuard config in templates excludes `user_rules`; the init container injects them from the Secret on each fresh pod start.
+  - DHCP interface is auto-detected by the init container when using `hostNetwork`.
 
 ### 🔧 kubectl Connectivity Issues
 
